@@ -16,24 +16,15 @@ import { createStore } from 'smitty'
 const initialState = { count: 0 }
 const store = createStore(initialState)
 
-// lets add one reducer
+// add a reducer
 store.addReducer({
   'count/ADD': (state, e) => {
-    // just log out the action and return original state
-    console.log('count/ADD\n', JSON.stringify(e, null, 2))
-    return state
+    // increment foos by amount and return NEW state
+    return Object.assign({}, state, { count: state.count + e.amount })
   }
 })
 
-// lets add another
-store.addReducer({
-  'count/ADD': (state, e) => {
-    // increment foos by ammount and return NEW state
-    return Object.assign({}, state, { count: state.count + e.ammount })
-  }
-})
-
-store.emit('count/ADD', { ammount: 5 })
+store.emit('count/ADD', { amount: 5 })
 
 console.log(store.state)  // logs `{ count: 5 }`
 ```
