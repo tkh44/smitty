@@ -7,6 +7,7 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
 ### Demos
 [Basic Example with Preact - CodePen](http://codepen.io/tkh44/pen/zNNPPq)
 
+[Fetch Example with Preact - CodePen](http://codepen.io/tkh44/pen/JEWKJX)
 
 ### Basics
 ```javascript
