@@ -1,11 +1,13 @@
 import mitt from 'mitt'
 
 export function createStore (initialState) {
-  let state = initialState
+  let state = Object.assign({}, initialState)
   let events = mitt()
 
   return {
     emit: events.emit,
+    on: events.on,
+    off: events.off,
     addReducer (reducer) {
       Object.keys(reducer).forEach((type) => {
         events.on(type, (e) => {
@@ -13,11 +15,7 @@ export function createStore (initialState) {
         })
       })
     },
-    get state () {
-      return state
-    },
-    set state (nextState) {
-      state = nextState
-    }
+    get state () { return state },
+    set state (nextState) { state = nextState }
   }
 }

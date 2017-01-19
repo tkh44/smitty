@@ -11,6 +11,10 @@ describe('smitty', () => {
     expect(createStore({ foo: 5 }).state).toEqual({ foo: 5 })
   })
 
+  it('exposes the mitt api', () => {
+    expect(createStore()).toIncludeKeys(['on', 'off', 'emit'])
+  })
+
   it('reducer is called with prev state and event data', (done) => {
     const store = createStore({ foo: 5 })
     store.addReducer({
@@ -38,10 +42,12 @@ describe('smitty', () => {
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(6)
         expect(e).toEqual({ foo: 'bar' })
-        done()
+        return { foo: state.foo + 2 }
       }
     })
 
     store.emit('foo/ADD', { foo: 'bar' })
+    expect(store.state.foo).toBe(8)
+    done()
   })
 })
