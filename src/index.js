@@ -1,6 +1,6 @@
 import mitt from 'mitt'
 
-export default function createStore (initialState) {
+export function createStore (initialState) {
   let state = initialState
   let events = mitt()
 

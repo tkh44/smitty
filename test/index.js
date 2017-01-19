@@ -1,6 +1,6 @@
 /* eslint-env mocha */
 import expect from 'expect'
-import createStore from '../src/index'
+import { createStore } from '../src/index'
 
 describe('smitty', () => {
   it('store is created', () => {
