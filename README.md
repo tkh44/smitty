@@ -12,7 +12,9 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
 ```javascript
 import { createStore } from 'smitty'
 
-const store = createStore({ count: 0 })
+// Create a store with initial state
+const initialState = { count: 0 }
+const store = createStore(initialState)
 
 // lets add one reducer
 store.addReducer({
@@ -31,6 +33,7 @@ store.addReducer({
   }
 })
 
-store.emit('foo/ADD', { ammount: 5 })
-console.log(store.state)
+store.emit('count/ADD', { ammount: 5 })
+
+console.log(store.state)  // logs `{ count: 5 }`
 ```
