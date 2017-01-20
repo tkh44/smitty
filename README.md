@@ -9,6 +9,8 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
 
 [Fetch Example with Preact - CodePen](http://codepen.io/tkh44/pen/JEWKJX)
 
+[Scroll Stress Test + connect HoC - CodePen](http://codepen.io/tkh44/pen/pReRVm)
+
 ### Basics
 ```javascript
 import { createStore } from 'smitty'
