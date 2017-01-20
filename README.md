@@ -13,6 +13,8 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
 
 [Fetch Example with Preact - CodePen](http://codepen.io/tkh44/pen/JEWKJX)
 
+[UI State Example with Preact - CodePen](http://codepen.io/tkh44/pen/xgqNqy)
+
 [Scroll Stress Test + connect HoC - CodePen](http://codepen.io/tkh44/pen/pReRVm)
 
 [State as a Map instead of plain object - CodePen](http://codepen.io/tkh44/pen/xgqBmO)
