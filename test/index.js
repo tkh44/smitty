@@ -30,6 +30,22 @@ describe('smitty', () => {
     done()
   })
 
+  it('warn when nothing is returned from reducer function', (done) => {
+    const store = createStore({ foo: 5 })
+
+    store.addReducer({
+      'foo/ADD': (state, e) => {
+        expect(state.foo).toBe(5)
+        expect(e).toEqual({ foo: 'bar' })
+        return null
+      }
+    })
+
+    expect(function () { store.emit('foo/ADD', { foo: 'bar' }) })
+      .toThrow(/You forgot to return something from your reducer function! Check: "foo\/ADD" on reducer with keys: foo\/ADD/)
+    done()
+  })
+
   it('reducers are called in order with updated state', (done) => {
     const store = createStore({ foo: 5 })
     store.addReducer({
