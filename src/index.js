@@ -10,15 +10,13 @@ export function createStore (initialState) {
     off: events.off,
     addReducer (reducer) {
       for (let type in reducer) {
-        if (reducer.hasOwnProperty(type)) {
-          events.on(type, (e) => {
-            let result = reducer[type](this.state, e)
-            if (!result) {
-              throw new Error(`You forgot to return something from your reducer function! Check: "${type}" on reducer with keys: ${Object.keys(reducer)}`)
-            }
-            this.state = result
-          })
-        }
+        events.on(type, (e) => {
+          let result = reducer[type](this.state, e)
+          if (!result) {
+            throw new Error(`You forgot to return something from your reducer function! Check: "${type}" on reducer with keys: ${Object.keys(reducer)}`)
+          }
+          this.state = result
+        })
       }
     },
     get state () { return state },
