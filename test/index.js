@@ -1,5 +1,6 @@
 /* eslint-env mocha */
 import expect from 'expect'
+import mitt from 'mitt'
 import { createStore } from '../src/index'
 
 describe('smitty', () => {
@@ -12,7 +13,7 @@ describe('smitty', () => {
   })
 
   it('exposes the mitt api', () => {
-    expect(createStore()).toIncludeKeys(['on', 'off', 'emit'])
+    expect(createStore()).toIncludeKeys(Object.keys(mitt()))
   })
 
   it('reducer is called with prev state and event data', (done) => {
@@ -21,11 +22,12 @@ describe('smitty', () => {
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 'bar' })
-        done()
+        return state
       }
     })
 
     store.emit('foo/ADD', { foo: 'bar' })
+    done()
   })
 
   it('reducers are called in order with updated state', (done) => {
