@@ -18,10 +18,7 @@ export function createStore (initialState) {
           events.on(type, (e) => {
             let result = reducer[type](this.state, e)
             if (!result) {
-              warn('You forgot to return something from your reducer! Check: "' +
-                type +
-                '" on reducer with keys: ' +
-                Object.keys(reducer))
+              warn(`You forgot to return something from your reducer! Check: "${type}" on reducer with keys: ${Object.keys(reducer)}`);
             }
             this.state = result
           })
