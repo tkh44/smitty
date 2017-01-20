@@ -2,6 +2,8 @@
 
 [![Npm Version](https://badge.fury.io/js/smitty.svg)](https://badge.fury.io/js/smitty)
 [![Build Status](https://travis-ci.org/tkh44/smitty.svg?branch=master)](https://travis-ci.org/tkh44/smitty)
+[![codecov](https://codecov.io/gh/tkh44/smitty/branch/master/graph/badge.svg)](https://codecov.io/gh/tkh44/smitty)
+
 
 
 Tiny flux implementation built on [mitt](https://git.io/mitt)
