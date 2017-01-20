@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "test": "standard src test && mocha --compilers js:babel-register test/**/*.js",
+    "test": "standard src test && node_modules/.bin/babel-node node_modules/.bin/babel-istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
     "build": "npm-run-all clean -p rollup:* -p minify:* -s size",
     "clean": "rimraf dist && mkdirp dist",
     "rollup:cjs": "rollup -c rollup.config.js -m -f cjs -n $npm_package_amdName $npm_package_jsnext_main -o $npm_package_main",
@@ -26,11 +26,12 @@
     "mitt": "^1.0.0"
   },
   "devDependencies": {
-    "babel-core": "^6.9.1",
+    "babel-cli": "^6.22.2",
     "babel-eslint": "^7.1.1",
+    "babel-istanbul": "^0.12.1",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-stage-0": "^6.5.0",
-    "babel-register": "^6.9.0",
+    "codecov": "^1.0.1",
     "expect": "^1.20.2",
     "gzip-size-cli": "^1.0.0",
     "jsdom": "^9.8.3",

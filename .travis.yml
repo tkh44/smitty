@@ -8,15 +8,10 @@ cache:
     - node_modules
 
 before_install:
-  - npm install codecov blanket mocha-lcov-reporter
+  - npm install codecov
 
-script:
-  - npm build
-  - npm test
-  - SMITTY_COVERAGE=1 ./node_modules/.bin/mocha \
-      --require blanket \
-      --reporter mocha-lcov-reporter
-    codecov
+after_success:
+  - cat ./coverage/lcov.info | ./node_modules/codecov/bin/codecov
 
 cache:
   directories:
