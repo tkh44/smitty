@@ -17,6 +17,8 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
 
 [State as a Map instead of plain object - CodePen](http://codepen.io/tkh44/pen/xgqBmO)
 
+[State as an Immutable Map instead of plain object - CodePen](http://codepen.io/tkh44/pen/MJpREe)
+
 ### Basics
 ```javascript
 import { createStore } from 'smitty'
