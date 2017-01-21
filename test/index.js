@@ -68,4 +68,26 @@ describe('smitty', () => {
     expect(store.state.foo).toBe(8)
     done()
   })
+
+  it('emit accepts a function argument and calls it with state and emit', (done) => {
+    const store = createStore({ foo: 5 })
+    store.addReducer({
+      'foo/ADD': (state, e) => {
+        expect(state.foo).toBe(5)
+        expect(e).toEqual(5)
+        return { foo: state.foo + e }
+      }
+    })
+
+    const action = (amount) => (emit, state) => {
+      expect(emit).toExist()
+      expect(state).toExist()
+
+      emit('foo/ADD', amount)
+      expect(store.state.foo).toBe(10)
+      done()
+    }
+
+    store.emit(action(5))
+  })
 })

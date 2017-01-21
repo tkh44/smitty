@@ -5,9 +5,13 @@ export function createStore (initialState) {
   let events = mitt()
 
   return {
-    emit: events.emit,
     on: events.on,
     off: events.off,
+    emit (type, payload) {
+      if (typeof type === 'function') return type(events.emit, this.state)
+
+      events.emit(type, payload)
+    },
     addReducer (reducer) {
       for (let type in reducer) {
         events.on(type, (e) => {
