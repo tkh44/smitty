@@ -18,6 +18,7 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
 - Fun
   - [UI colors with Immutable.Map as state](http://codepen.io/tkh44/pen/xgqNqy)
   - [UI colors with custom class as state](http://codepen.io/tkh44/pen/OWmqBz)
+  - [Scroll sync](http://codepen.io/tkh44/pen/pReRVm)
 
 ### Basics
 ```javascript
