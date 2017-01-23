@@ -90,4 +90,4 @@ result.then(() => console.log(store.state)) // logs `{ 1a: { id: '1a', title: 'M
 
 ```
 ### Thanks
-Thanks to [@developit](https://github.com/developit) for [mitt](https://git.io/mitt) and the project structure.
+Thanks to [developit](https://github.com/developit) for [mitt](https://git.io/mitt) and the project structure.
