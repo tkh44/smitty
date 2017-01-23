@@ -9,19 +9,15 @@
 Tiny flux implementation built on [mitt](https://git.io/mitt)
 
 ### Demos
-[Basic Example with Preact - CodePen](http://codepen.io/tkh44/pen/zNNPPq)
-
-[Fetch Example with Preact - CodePen](http://codepen.io/tkh44/pen/JEWKJX)
-
-[UI State Example with Preact - CodePen](http://codepen.io/tkh44/pen/xgqNqy)
-
-[Scroll Stress Test + connect HoC - CodePen](http://codepen.io/tkh44/pen/pReRVm)
-
-[State as a Map instead of plain object - CodePen](http://codepen.io/tkh44/pen/xgqBmO)
-
-[State as an Immutable Map instead of plain object - CodePen](http://codepen.io/tkh44/pen/MJpREe)
-
-[State as a class](http://codepen.io/tkh44/pen/OWmqBz)
+- Basic
+  - [Object as state](http://codepen.io/tkh44/pen/zNNPPq)
+  - [Map as state](http://codepen.io/tkh44/pen/xgqBmO)
+  - [Immutable.Map as state](http://codepen.io/tkh44/pen/MJpREe)
+- Async
+  - [Fetch api with Immutable.Map as state](http://codepen.io/tkh44/pen/JEWKJX)
+- Fun
+  - [UI colors with Immutable.Map as state](http://codepen.io/tkh44/pen/xgqNqy)
+  - [UI colors with custom class as state](http://codepen.io/tkh44/pen/OWmqBz)
 
 ### Basics
 ```javascript
