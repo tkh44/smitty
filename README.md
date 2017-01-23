@@ -7,6 +7,9 @@
 
 
 Tiny flux implementation built on [mitt](https://git.io/mitt)
+```bash
+npm install -S smitty
+```
 
 ### Demos
 - Basic
@@ -19,6 +22,12 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
   - [UI colors with Immutable.Map as state](http://codepen.io/tkh44/pen/xgqNqy)
   - [UI colors with custom class as state](http://codepen.io/tkh44/pen/OWmqBz)
   - [Scroll sync](http://codepen.io/tkh44/pen/pReRVm)
+
+### Add-ons
+- Preact bindings [preact-smitty](https://github.com/tkh44/preact-smitty)
+  - ```npm install preact-smitty```
+- React bindings [react-smitty](https://github.com/tkh44/react-smitty)
+  - ```npm install react-smitty```
 
 ### Basics
 ```javascript
