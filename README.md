@@ -59,6 +59,7 @@ const store = createStore(initialState)
 store.addReducer({
   'REQUEST_ROOM': (state, { id, res }) => {
     return {
+      ...state,
       [id]: {
         ...state[id],
         ...res.data
