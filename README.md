@@ -21,7 +21,7 @@ Tiny flux implementation built on [mitt](https://git.io/mitt)
 
 [State as an Immutable Map instead of plain object - CodePen](http://codepen.io/tkh44/pen/MJpREe)
 
-[State as a Class (mutable state if that is your thing)](http://codepen.io/tkh44/pen/OWmqBz)
+[State as a class](http://codepen.io/tkh44/pen/OWmqBz)
 
 ### Basics
 ```javascript
