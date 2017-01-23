@@ -24,9 +24,9 @@ npm install -S smitty
   - [Scroll sync](http://codepen.io/tkh44/pen/pReRVm)
 
 ### Add-ons
-- Preact bindings [preact-smitty](https://github.com/tkh44/preact-smitty)
+- Preact bindings - [preact-smitty](https://github.com/tkh44/preact-smitty)
   - ```npm install preact-smitty```
-- React bindings [react-smitty](https://github.com/tkh44/react-smitty)
+- React bindings - [react-smitty](https://github.com/tkh44/react-smitty)
   - ```npm install react-smitty```
 
 ### Basics
