@@ -42,7 +42,7 @@ describe('smitty', () => {
     })
 
     expect(function () { store.emit('foo/ADD', { foo: 'bar' }) })
-      .toThrow(/You forgot to return something from your reducer function! Check: "foo\/ADD" on reducer with keys: foo\/ADD/)
+      .toThrow(/"foo\/ADD" has no return value\./)
     done()
   })
 
