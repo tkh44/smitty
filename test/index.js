@@ -16,7 +16,7 @@ describe('smitty', () => {
     expect(createStore()).toIncludeKeys(Object.keys(mitt()))
   })
 
-  it('reducer is called with prev state and event data', (done) => {
+  it('reducer is called with prev state and event data', done => {
     const store = createStore({ foo: 5 })
     store.addReducer({
       'foo/ADD': (state, e) => {
@@ -30,7 +30,7 @@ describe('smitty', () => {
     done()
   })
 
-  it('no return from reducer is acceptable', (done) => {
+  it('no return from reducer is acceptable', done => {
     const store = createStore({ foo: 5 })
     store.addReducer({
       'foo/ADD': (state, e) => {
@@ -43,7 +43,7 @@ describe('smitty', () => {
     done()
   })
 
-  it('reducers are called in order with updated state', (done) => {
+  it('reducers are called in order with updated state', done => {
     const store = createStore({ foo: 5 })
     store.addReducer({
       'foo/ADD': (state, e) => {
@@ -66,7 +66,7 @@ describe('smitty', () => {
     done()
   })
 
-  it('emit accepts a function argument and calls it with state and emit', (done) => {
+  it('emit accepts a function argument and calls it with state and emit', done => {
     const store = createStore({ foo: 5 })
     store.addReducer({
       'foo/ADD': (state, e) => {
@@ -76,7 +76,7 @@ describe('smitty', () => {
       }
     })
 
-    const action = (amount) => (emit, state) => {
+    const action = amount => (emit, state) => {
       expect(emit).toExist()
       expect(state).toExist()
 

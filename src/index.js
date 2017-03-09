@@ -14,12 +14,16 @@ export function createStore (initialState) {
     },
     addReducer (reducer) {
       for (let type in reducer) {
-        events.on(type, (e) => {
+        events.on(type, e => {
           this.state = reducer[type](this.state, e) || this.state
         })
       }
     },
-    get state () { return state },
-    set state (nextState) { state = nextState }
+    get state () {
+      return state
+    },
+    set state (nextState) {
+      state = nextState
+    }
   }
 }
