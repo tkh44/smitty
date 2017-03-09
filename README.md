@@ -16,6 +16,7 @@ npm install -S smitty
   - [Object as state](http://codepen.io/tkh44/pen/zNNPPq)
   - [Map as state](http://codepen.io/tkh44/pen/xgqBmO)
   - [Immutable.Map as state](http://codepen.io/tkh44/pen/MJpREe)
+  - [Preact Router Example](http://codepen.io/seveves/pen/ryyNYz)
 - Async
   - [Fetch api with Immutable.Map as state](http://codepen.io/tkh44/pen/JEWKJX)
 - Fun
