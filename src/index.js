@@ -15,11 +15,7 @@ export function createStore (initialState) {
     addReducer (reducer) {
       for (let type in reducer) {
         events.on(type, (e) => {
-          let result = reducer[type](this.state, e)
-          if (!result) {
-            throw new Error(`"${type}" has no return value.`)
-          }
-          this.state = result
+          this.state = reducer[type](this.state, e) || this.state
         })
       }
     },

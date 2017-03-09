@@ -30,19 +30,16 @@ describe('smitty', () => {
     done()
   })
 
-  it('warn when nothing is returned from reducer function', (done) => {
+  it('no return from reducer is acceptable', (done) => {
     const store = createStore({ foo: 5 })
-
     store.addReducer({
       'foo/ADD': (state, e) => {
-        expect(state.foo).toBe(5)
-        expect(e).toEqual({ foo: 'bar' })
-        return null
+        state.foo += 5
       }
     })
 
-    expect(function () { store.emit('foo/ADD', { foo: 'bar' }) })
-      .toThrow(/"foo\/ADD" has no return value\./)
+    store.emit('foo/ADD', { foo: 'bar' })
+    expect(store.state.foo).toBe(10)
     done()
   })
 
