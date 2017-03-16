@@ -9,9 +9,9 @@
   <br>
   Smitty
   <br>
-  <p style="font-size: 1rem;">Tiny flux implementation built on <a style="color: #9B86FF;" href="https://git.io/mitt">mitt</a></p>
   <br>
 </h1>
+<p align="center" style="font-size: 1.2rem;">Tiny flux implementation built on <a style="color: #9B86FF;" href="https://git.io/mitt">mitt</a></p>
 
 
 ```bash
