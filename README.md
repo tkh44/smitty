@@ -4,9 +4,16 @@
 [![Build Status](https://travis-ci.org/tkh44/smitty.svg?branch=master)](https://travis-ci.org/tkh44/smitty)
 [![codecov](https://codecov.io/gh/tkh44/smitty/branch/master/graph/badge.svg)](https://codecov.io/gh/tkh44/smitty)
 
+<h1 align="center" style="color: #343a40">
+  <img src="https://cdn.rawgit.com/tkh44/smitty/master/smitty.svg" alt="Smitty" width="200">
+  <br>
+  Smitty
+  <br>
+  <p style="font-size: 67.5%;">Tiny flux implementation built on <a style="color: #9B86FF;" href="https://git.io/mitt">mitt</a></p>
+  <br>
+</h1>
 
 
-Tiny flux implementation built on [mitt](https://git.io/mitt)
 ```bash
 npm install -S smitty
 ```
