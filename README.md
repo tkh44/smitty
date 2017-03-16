@@ -9,7 +9,7 @@
   <br>
   Smitty
   <br>
-  <p style="font-size: 67.5%;">Tiny flux implementation built on <a style="color: #9B86FF;" href="https://git.io/mitt">mitt</a></p>
+  <p style="font-size: 1rem;">Tiny flux implementation built on <a style="color: #9B86FF;" href="https://git.io/mitt">mitt</a></p>
   <br>
 </h1>
 
