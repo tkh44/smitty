@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/tkh44/smitty/branch/master/graph/badge.svg)](https://codecov.io/gh/tkh44/smitty)
 
 <h1 align="center" style="color: #343a40">
-  <img src="https://cdn.rawgit.com/tkh44/smitty/master/smitty.svg" alt="Smitty" width="200">
+  <img src="https://cdn.rawgit.com/tkh44/smitty/master/smitty.png" alt="Smitty" width="200">
   <br>
   Smitty
   <br>
