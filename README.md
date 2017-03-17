@@ -89,7 +89,7 @@ console.log(store.state)  // logs `{ count: 5 }`
 
 ## Store
 
-### **emit**:
+### emit: (_function_)
 
 **arguments**
  
@@ -156,7 +156,7 @@ console.log(store.state)  // logs `{ count: 5 }`
     console.log(store.state) // logs { name: 'River' }
     ```
     
-### **addReducer**:
+### addReducer: (_function_)
 
 **arguments**
  
@@ -181,11 +181,11 @@ console.log(store.state)  // logs `{ count: 5 }`
     console.log(store.state) // { color: 'green', hovered: true, highlighted: false 
     ```
 
-#### **on**: _function_
+### on: (_function_)
 
 Convenience shortcut for [mitt.on](https://github.com/developit/mitt/#on).
 
-#### **off**: _function_
+### off: (_function_)
  
 Convenience shortcut for [mitt.off](https://github.com/developit/mitt/#off).
 
