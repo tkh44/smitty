@@ -14,30 +14,20 @@
 <p align="center" style="font-size: 1.2rem;">Tiny flux implementation built on <a style="color: #9B86FF;" href="https://git.io/mitt">mitt</a></p>
 
 
+
+-   [Install](#install)
+-   [Basic Usage](#basic-usage)
+-   [Demos](#demos)
+-   [API](#api)
+-   [Store](#store)
+
+## Install
+
 ```bash
 npm install -S smitty
 ```
 
-### Demos
-- Basic
-  - [Object as state](http://codepen.io/tkh44/pen/zNNPPq)
-  - [Map as state](http://codepen.io/tkh44/pen/xgqBmO)
-  - [Immutable.Map as state](http://codepen.io/tkh44/pen/MJpREe)
-  - [Preact Router Example](http://codepen.io/seveves/pen/ryyNYz)
-- Async
-  - [Fetch api with Immutable.Map as state](http://codepen.io/tkh44/pen/JEWKJX)
-- Fun
-  - [UI colors with Immutable.Map as state](http://codepen.io/tkh44/pen/xgqNqy)
-  - [UI colors with custom class as state](http://codepen.io/tkh44/pen/OWmqBz)
-  - [Scroll sync](http://codepen.io/tkh44/pen/pReRVm)
-
-### Add-ons
-- Preact bindings - [preact-smitty](https://github.com/tkh44/preact-smitty)
-  - ```npm install preact-smitty```
-- React bindings - [react-smitty](https://github.com/tkh44/react-smitty)
-  - ```npm install react-smitty```
-
-### Basics
+## Basic Usage
 ```javascript
 import { createStore } from 'smitty'
 
@@ -57,12 +47,154 @@ store.emit('count/ADD', { amount: 5 })
 
 console.log(store.state)  // logs `{ count: 5 }`
 ```
+---
 
-### Action Creators
+## Demos
+- Basic
+  - [Object as state](http://codepen.io/tkh44/pen/zNNPPq)
+  - [Map as state](http://codepen.io/tkh44/pen/xgqBmO)
+  - [Immutable.Map as state](http://codepen.io/tkh44/pen/MJpREe)
+  - [Preact Router Example](http://codepen.io/seveves/pen/ryyNYz)
+- Async
+  - [Fetch api with Immutable.Map as state](http://codepen.io/tkh44/pen/JEWKJX)
+- Fun
+  - [UI colors with Immutable.Map as state](http://codepen.io/tkh44/pen/xgqNqy)
+  - [UI colors with custom class as state](http://codepen.io/tkh44/pen/OWmqBz)
+  - [Scroll sync](http://codepen.io/tkh44/pen/pReRVm)
+
+## Add-ons
+- Preact bindings - [preact-smitty](https://github.com/tkh44/preact-smitty)
+  - ```npm install preact-smitty```
+- React bindings - [react-smitty](https://github.com/tkh44/react-smitty)
+  - ```npm install react-smitty```
+
+---
+
+## API
+
+## `createStore(initialState: any)`
+
+#### Arguments 
+
+`initialState: any` **required**: Determines the shape and initial state of your store. Can be of any type that you choose.
+
+#### Returns 
+
+`Store: Store` **store**: Determines the shape and initial state of your store. Can be of any type that you choose.
+
+---
+
+## Store
+
+#### **emit**:
+
+**arguments**
+ 
+ - **type**: _string_ | _function_
+ 
+    - [string], `type` determines which reducers are called.
+        
+        If the state's value was `0` 
+        
+        ```js
+        const store = createStore(0)
+        store.addReducer({
+          add: function (state, payload) {
+            return state + payload
+          }
+        })
+        console.log(store.state) // logs 0
+        emit('add', 1)
+        console.log(store.state) // logs 1
+        ```
+     
+    - [function] `type` becomes an action creator that is passed 2 arguments
+        
+        - **emit**: `store.emit`
+        - **state**: the store's current state
+        
+             _`state` is a getter property so it will always return the latest version. Short cut for getState()_ 
+        
+        This is useful to emit multiple actions from a single emit call.
+        
+        ```js
+        const store = createStore(0)
+        store.addReducer({
+          add: function (state, payload) {
+            return state + payload
+          }
+        })
+        function apiAction (emit, state) {
+          emit('add', 1)
+          console.log(state) // logs 1
+          setTimeout(() => {
+            emit('add', 1)
+            console.log(state) // logs 3
+          }, 100)
+          emit('add', 1)
+          console.log(state) // logs 2
+        }
+        ```
+
+ - **payload**: _any_ (optional)
+
+    payload to pass to your reducer
+    
+    ```js
+    const store = createStore({ name: 'Arrow' })
+    store.addReducer({
+      'update/NAME': function (state, payload) {
+        // I really don't care if you return a new state
+        // Nobody is judging. Do what your ❤️ tells you.
+        // Just be consistent
+        return Object.assign({}, state, payload)
+      }
+    })
+    console.log(store.state) // logs { name: 'Arrow' }
+    emit('update/NAME', { name: 'River' })
+    console.log(store.state) // logs { name: 'River' }
+    ```
+    
+#### **addReducer**:
+
+**arguments**
+ 
+ - **reducer**: _object_
+ 
+    Object with keys that correspond to action types passed to `emit`
+    
+    ```js
+    const store = createStore({ color: 'blue', hovered: false })
+    store.addReducer({
+      'merge': function (state, payload) {
+        return Object.assign({}, state, payload)
+      },
+      'overwrite': function (state, payload) {
+        return payload
+      }
+    })
+    console.log(store.state) // logs { color: 'blue', hovered: false }
+    emit('merge', { color: 'red' })
+    console.log(store.state) // { color: 'red', hovered: false }
+    emit('overwrite', { color: 'green', hovered: true, highlighted: false })
+    console.log(store.state) // { color: 'green', hovered: true, highlighted: false 
+    ```
+
+#### **on**: _function_
+
+Convenience shortcut for [mitt.on](https://github.com/developit/mitt/#on).
+
+#### **off**: _function_
+ 
+Convenience shortcut for [mitt.off](https://github.com/developit/mitt/#off).
+
+---
+
+## Action Creator Detailed Example
 
 You can pass a function to `emit` in order to create an action creator
 
-You can see a running example here: http://codepen.io/tkh44/pen/JEWKJX
+**[running example](http://codepen.io/tkh44/pen/JEWKJX)**
 
 ```javascript
 import { createStore } from 'smitty'
@@ -73,7 +205,7 @@ const store = createStore(initialState)
 
 // add our reducer
 store.addReducer({
-  'REQUEST_ROOM': (state, { id, res }) => {
+  'api/GET_ROOM': (state, { id, res }) => {
     return {
       ...state,
       [id]: {
@@ -106,5 +238,6 @@ console.log(result) // logs "Promise {[[PromiseStatus]]: "pending", [[PromiseVal
 result.then(() => console.log(store.state)) // logs `{ 1a: { id: '1a', title: 'My Room' }``
 
 ```
+
 ### Thanks
 Thanks to [developit](https://github.com/developit) for [mitt](https://git.io/mitt) and the project structure.
