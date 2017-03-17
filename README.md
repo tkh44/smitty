@@ -113,7 +113,7 @@ console.log(store.state)  // logs `{ count: 5 }`
           }
         })
         console.log(store.state) // logs 0
-        emit('add', 1)
+        store.emit('add', 1)
         console.log(store.state) // logs 1
         ```
      
@@ -160,7 +160,7 @@ console.log(store.state)  // logs `{ count: 5 }`
       }
     })
     console.log(store.state) // logs { name: 'Arrow' }
-    emit('update/NAME', { name: 'River' })
+    store.emit('update/NAME', { name: 'River' })
     console.log(store.state) // logs { name: 'River' }
     ```
     
@@ -183,9 +183,9 @@ console.log(store.state)  // logs `{ count: 5 }`
       }
     })
     console.log(store.state) // logs { color: 'blue', hovered: false }
-    emit('merge', { color: 'red' })
+    store.emit('merge', { color: 'red' })
     console.log(store.state) // { color: 'red', hovered: false }
-    emit('overwrite', { color: 'green', hovered: true, highlighted: false })
+    store.emit('overwrite', { color: 'green', hovered: true, highlighted: false })
     console.log(store.state) // { color: 'green', hovered: true, highlighted: false 
     ```
 
