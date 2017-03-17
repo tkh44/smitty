@@ -1,9 +1,3 @@
-# smitty
-
-[![npm version](https://badge.fury.io/js/smitty.svg)](https://badge.fury.io/js/smitty)
-[![Build Status](https://travis-ci.org/tkh44/smitty.svg?branch=master)](https://travis-ci.org/tkh44/smitty)
-[![codecov](https://codecov.io/gh/tkh44/smitty/branch/master/graph/badge.svg)](https://codecov.io/gh/tkh44/smitty)
-
 <h1 align="center" style="color: #343a40">
   <img src="https://cdn.rawgit.com/tkh44/smitty/master/smitty.png" alt="smitty" width="200">
   <br>
@@ -13,7 +7,11 @@
 </h1>
 <p align="center" style="font-size: 1.2rem;">Tiny flux implementation built on <a style="color: #9B86FF;" href="https://git.io/mitt">mitt</a></p>
 
+# smitty
 
+[![npm version](https://badge.fury.io/js/smitty.svg)](https://badge.fury.io/js/smitty)
+[![Build Status](https://travis-ci.org/tkh44/smitty.svg?branch=master)](https://travis-ci.org/tkh44/smitty)
+[![codecov](https://codecov.io/gh/tkh44/smitty/branch/master/graph/badge.svg)](https://codecov.io/gh/tkh44/smitty)
 
 -   [Install](#install)
 -   [Basic Usage](#basic-usage)
