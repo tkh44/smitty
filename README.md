@@ -18,9 +18,10 @@
 -   [Install](#install)
 -   [Basic Usage](#basic-usage)
 -   [Demos](#demos)
--   [Add-ons](#add-ons)
+-   [Usage with Preact and React](#add-ons)
 -   [API](#api)
 -   [Store](#store)
+-   [Action Creator Detailed Example](#action-creator-detailed-example)
 
 ## Install
 
@@ -65,11 +66,18 @@ console.log(store.state)  // logs `{ count: 5 }`
 
 ---
 
-## Add-ons
+## Usage with Preact and React
 - Preact bindings - [preact-smitty](https://github.com/tkh44/preact-smitty)
-  - ```npm install preact-smitty```
+  
+  ```bash
+  npm install preact-smitty
+  ```
+
 - React bindings - [react-smitty](https://github.com/tkh44/react-smitty)
-  - ```npm install react-smitty```
+  
+  ```bash
+  npm install react-smitty
+  ```
 
 ---
 
@@ -93,7 +101,7 @@ console.log(store.state)  // logs `{ count: 5 }`
 
 **arguments**
  
- - **type**: _string_ | _function_
+ - **type**: (_string_ | _function_)
  
     - [string], `type` determines which reducers are called.
         
@@ -137,7 +145,7 @@ console.log(store.state)  // logs `{ count: 5 }`
         }
         ```
 
- - **payload**: _any_ (optional)
+ - **payload**: (_any_) optional
 
     payload to pass to your reducer
     
@@ -160,7 +168,7 @@ console.log(store.state)  // logs `{ count: 5 }`
 
 **arguments**
  
- - **reducer**: _object_
+ - **reducer**: (_object_)
  
     Object with keys that correspond to action types passed to `emit`
     
