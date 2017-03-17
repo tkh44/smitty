@@ -18,6 +18,7 @@
 -   [Install](#install)
 -   [Basic Usage](#basic-usage)
 -   [Demos](#demos)
+-   [Add-ons](#add-ons)
 -   [API](#api)
 -   [Store](#store)
 
@@ -61,6 +62,8 @@ console.log(store.state)  // logs `{ count: 5 }`
   - [UI colors with Immutable.Map as state](http://codepen.io/tkh44/pen/xgqNqy)
   - [UI colors with custom class as state](http://codepen.io/tkh44/pen/OWmqBz)
   - [Scroll sync](http://codepen.io/tkh44/pen/pReRVm)
+
+---
 
 ## Add-ons
 - Preact bindings - [preact-smitty](https://github.com/tkh44/preact-smitty)
