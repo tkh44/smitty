@@ -89,15 +89,13 @@ console.log(store.state)  // logs `{ count: 5 }`
 
 ## Store
 
-#### **emit**:
+### **emit**:
 
 **arguments**
  
  - **type**: _string_ | _function_
  
     - [string], `type` determines which reducers are called.
-        
-        If the state's value was `0` 
         
         ```js
         const store = createStore(0)
@@ -158,7 +156,7 @@ console.log(store.state)  // logs `{ count: 5 }`
     console.log(store.state) // logs { name: 'River' }
     ```
     
-#### **addReducer**:
+### **addReducer**:
 
 **arguments**
  
