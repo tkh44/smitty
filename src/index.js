@@ -9,7 +9,6 @@ export function createStore (initialState) {
     off: events.off,
     emit (type, payload) {
       if (typeof type === 'function') return type(events.emit, this.state)
-
       events.emit(type, payload)
     },
     addReducer (reducer) {

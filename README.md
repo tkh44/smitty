@@ -37,9 +37,17 @@ const store = createStore(initialState)
 
 // add a reducer
 store.addReducer({
-  'count/ADD': (state, e) => {
-    // increment foos by amount and return NEW state
+  'count/ADD': (state, e, type) => {
+    // increment foos by amount
     return Object.assign({}, state, { count: state.count + e.amount })
+  },
+  '*': (state, e, type) => {
+    // '*' can be used for all kinds of fun stuff
+    console.log(e, type)
+    if (type === 'count/ADD') {
+      //...do something
+    }
+    return state
   }
 })
 
@@ -170,6 +178,12 @@ console.log(store.state)  // logs `{ count: 5 }`
  
     Object with keys that correspond to action types passed to `emit`
     
+    When an event is emitted and the key matches the type the reducer is invoked with 3 arguments.
+        
+    - **state**: (_any_) the store's state getter
+    - **payload** (__any__) the payload that was emitted
+    - **type** (__string__) the type that was emitted
+
     ```js
     const store = createStore({ color: 'blue', hovered: false })
     store.addReducer({
@@ -178,6 +192,12 @@ console.log(store.state)  // logs `{ count: 5 }`
       },
       'overwrite': function (state, payload) {
         return payload
+      },
+   
+      // Could do the same in one
+      // If you really miss redux do this and put a switch statement
+      '*': function(state, payload, type) {
+        return type === 'merge' ? Object.assign({}, state, payload) : payload
       }
     })
     console.log(store.state) // logs { color: 'blue', hovered: false }
