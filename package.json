@@ -1,7 +1,7 @@
 {
   "name": "smitty",
   "amdName": "smitty",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Tiny flux implementation built on mitt",
   "main": "dist/smitty.js",
   "umd:main": "dist/smitty.min.js",
