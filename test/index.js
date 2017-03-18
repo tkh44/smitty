@@ -19,14 +19,37 @@ describe('smitty', () => {
   it('reducer is called with prev state and event data', done => {
     const store = createStore({ foo: 5 })
     store.addReducer({
-      'foo/ADD': (state, e) => {
+      'foo/ADD': (state, e, type) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 'bar' })
+        expect(type).toEqual('foo/ADD')
         return state
-      }
+      },
+      '*': () => {} // Test '*' event branch with no state returned
     })
 
     store.emit('foo/ADD', { foo: 'bar' })
+    done()
+  })
+
+  it('handles * event type', done => {
+    const store = createStore({ foo: 5 })
+    store.addReducer({
+      'foo/ADD': (state, e, type) => {
+        expect(state.foo).toBe(5)
+        expect(e).toEqual({ foo: 5 })
+        expect(type).toEqual('foo/ADD')
+        return { foo: state.foo + e.foo }
+      },
+      '*': (state, e, type) => {
+        expect(state.foo).toBe(10)
+        expect(e).toEqual({ foo: 5 })
+        expect(type).toEqual('foo/ADD')
+        return { foo: state.foo + e.foo }
+      }
+    })
+
+    store.emit('foo/ADD', { foo: 5 })
     done()
   })
 

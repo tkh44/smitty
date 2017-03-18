@@ -14,9 +14,18 @@ export function createStore (initialState) {
     },
     addReducer (reducer) {
       for (let type in reducer) {
-        events.on(type, e => {
-          this.state = reducer[type](this.state, e) || this.state
-        })
+        let handler
+        if (type === '*') {
+          handler = (eventType, e) => {
+            this.state = reducer[type](this.state, e, eventType) || this.state
+          }
+        } else {
+          handler = e => {
+            this.state = reducer[type](this.state, e, type) || this.state
+          }
+        }
+
+        events.on(type, handler)
       }
     },
     get state () {

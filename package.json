@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "test": "standard src test && node_modules/.bin/babel-node node_modules/.bin/babel-istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec",
+    "test": "standard src test && node_modules/.bin/babel-node node_modules/.bin/babel-istanbul cover ./node_modules/mocha/bin/_mocha --report html -- -R spec",
     "build": "npm-run-all clean -p rollup:* -p minify:* -s size",
     "clean": "rimraf dist && mkdirp dist",
     "rollup:cjs": "rollup -c rollup.config.js -m -f cjs -n $npm_package_amdName $npm_package_jsnext_main -o $npm_package_main",
