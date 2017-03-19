@@ -99,15 +99,58 @@ describe('smitty', () => {
       }
     })
 
-    const action = amount => (emit, state) => {
-      expect(emit).toExist()
-      expect(state).toExist()
+    const action = amount =>
+      (emit, state) => {
+        expect(emit).toExist()
+        expect(state).toExist()
 
-      emit('foo/ADD', amount)
-      expect(store.state.foo).toBe(10)
-      done()
-    }
+        emit('foo/ADD', amount)
+        expect(store.state.foo).toBe(10)
+        done()
+      }
 
     store.emit(action(5))
+  })
+
+  it('accepts class as reducer', done => {
+    const store = createStore({ foo: 5 })
+
+    class HistoryReducer {
+      constructor (initialHistory = []) {
+        this.history = createStore(initialHistory)
+        this.history.addReducer({
+          update: (state, e) => {
+            state.push(e)
+          }
+        })
+      }
+
+      onUpdate (state, e, type) {
+        this.history.emit('update', { state, e, type })
+      }
+    }
+
+    HistoryReducer.prototype['foo/ADD'] = function (state, e, type) {
+      state.foo += e.foo
+      this.onUpdate(state, e, type)
+    }
+
+    const historyReducer = new HistoryReducer([])
+    store.addReducer(historyReducer)
+
+    store.emit('foo/ADD', { foo: 5 })
+    expect(store.state.foo).toBe(10)
+    expect(historyReducer.history.state).toEqual([
+      {
+        state: {
+          foo: 10
+        },
+        e: {
+          foo: 5
+        },
+        type: 'foo/ADD'
+      }
+    ])
+    done()
   })
 })

@@ -20,6 +20,7 @@
 -   [API](#api)
 -   [Store](#store)
 -   [Action Creator Detailed Example](#action-creator-detailed-example)
+-   [Class As Reducer](#class-as-reducer)
 
 ## Install
 
@@ -180,10 +181,10 @@ console.log(store.state)  // logs `{ count: 5 }`
     Object with keys that correspond to action types passed to `emit`
     
     When an event is emitted and the key matches the type the reducer is invoked with 3 arguments.
-        
-    - **state**: (_any_) the store's state getter
-    - **payload** (__any__) the payload that was emitted
-    - **type** (__string__) the type that was emitted
+
+      - **state**: (_any_) the store's state getter
+      - **payload** (__any__) the payload that was emitted
+      - **type** (__string__) the type that was emitted
 
     ```js
     const store = createStore({ color: 'blue', hovered: false })
@@ -194,7 +195,7 @@ console.log(store.state)  // logs `{ count: 5 }`
       'overwrite': function (state, payload) {
         return payload
       },
-   
+    
       // Could do the same in one
       // If you really miss redux do this and put a switch statement
       '*': function(state, payload, type) {
@@ -264,6 +265,51 @@ console.log(result) // logs "Promise {[[PromiseStatus]]: "pending", [[PromiseVal
 
 // After the fetch call, `REQUEST_ROOM` is fired a second time with our response data
 result.then(() => console.log(store.state)) // logs `{ 1a: { id: '1a', title: 'My Room' }``
+
+```
+
+## Class As Reducer
+
+You can pass a function to `emit` in order to create an action creator
+
+**[running example](http://codepen.io/tkh44/pen/JEWKJX)**
+
+```javascript
+const store = createStore({ foo: 5 })
+
+class HistoryReducer {
+  constructor (initialHistory = []) {
+    this.history = createStore(initialHistory)
+    this.history.addReducer({
+      update: (state, e) => {
+        state.push(e)
+      }
+    })
+  }
+
+  onUpdate (state, e, type) {
+    this.history.emit('update', { state, e, type })
+  }
+}
+
+HistoryReducer.prototype['foo/ADD'] = function (state, e, type) {
+  state.foo += e.foo
+  this.onUpdate(state, e, type)
+}
+
+const historyReducer = new HistoryReducer([])
+store.addReducer(historyReducer)
+
+store.emit('foo/ADD', { foo: 5 })
+console.log(store.state.foo) // logs 10
+store.emit('foo/ADD', { foo: 7 })
+console.log(store.state.foo) // logs 17
+console.log(historyReducer.history.state)
+// logs
+// [
+//   { state: { foo: 10 }, e: { foo: 5 }, type: 'foo/ADD' },
+//   { state: { foo: 17 }, e: { foo: 7 }, type: 'foo/ADD' }
+// ]
 
 ```
 
