@@ -269,10 +269,7 @@ result.then(() => console.log(store.state)) // logs `{ 1a: { id: '1a', title: 'M
 ```
 
 ## Class As Reducer
-
-You can pass a function to `emit` in order to create an action creator
-
-**[running example](http://codepen.io/tkh44/pen/JEWKJX)**
+Reducers are iterated with `for (let type in reducer) {...}` with no `obj.hasOwnProperty` check so this works.
 
 ```javascript
 const store = createStore({ foo: 5 })
