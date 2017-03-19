@@ -14,16 +14,14 @@ export function createStore (initialState) {
     addReducer (reducer) {
       for (let type in reducer) {
         let handler
-        if (type === '*') {
-          handler = (eventType, e) => {
-            this.state = reducer[type](this.state, e, eventType) || this.state
-          }
-        } else {
-          handler = e => {
-            this.state = reducer[type](this.state, e, type) || this.state
-          }
+        handler = (eventType, e) => {
+          if (eventType.substring(0, 6) === 'store:') return
+          this.state = reducer[type](this.state, e, eventType) || this.state
+          events.emit('store:change', this.state)
         }
-
+        if (type !== '*') {
+          handler = handler.bind(null, type)
+        }
         events.on(type, handler)
       }
     },
