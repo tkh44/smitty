@@ -99,7 +99,7 @@ console.log(store.state)  // logs `{ count: 5 }`
 
 #### Returns 
 
-`Store: Store` **store**: Determines the shape and initial state of your store. Can be of any type that you choose.
+`Store: Store` **[Store](#store)**
 
 ---
 
