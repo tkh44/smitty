@@ -59,6 +59,8 @@ console.log(store.state)  // logs `{ count: 5 }`
 ---
 
 ## Demos
+- [Photo Booth](https://tkh44.github.io/smitty/)
+  - [source](https://github.com/tkh44/smitty/blob/master/demo/src)
 - Basic
   - [Object as state](http://codepen.io/tkh44/pen/zNNPPq)
   - [Map as state](http://codepen.io/tkh44/pen/xgqBmO)
