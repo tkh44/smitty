@@ -1,6 +1,5 @@
 /** @jsx h */
 import './style.css'
-// eslint-disable-next-line no-unused-vars
 import { render, h, Component } from 'preact'
 import { Provider, connect } from 'preact-smitty'
 import { createStore } from '../../src'
@@ -15,7 +14,7 @@ const store = createStore({
 
 const recordVideo = (emit, { camera }) => {
   if (camera.recording) {
-    emit(stopRecording)
+    emit('camera/STOP_RECORDING')
     return
   }
 
@@ -27,12 +26,11 @@ const recordVideo = (emit, { camera }) => {
       video: { width: 1280, height: 720 }
     })
     .then(stream => {
-      emit('camera/SET_STREAM', stream)
+      emit('camera/SET_STREAM_SUCCESS', stream)
     })
-}
-
-function stopRecording (emit, state) {
-  emit('camera/STOP_RECORDING')
+    .catch(err => {
+      emit('camera/SET_STREAM_ERROR', err)
+    })
 }
 
 store.addReducer({
@@ -42,8 +40,11 @@ store.addReducer({
   'camera/STOP_RECORDING': state => {
     state.camera.recording = false
   },
-  'camera/SET_STREAM': (state, payload) => {
+  'camera/SET_STREAM_SUCCESS': (state, payload) => {
     state.camera.stream = payload
+  },
+  'camera/SET_STREAM_ERROR': (state, payload) => {
+    state.camera.streamError = payload
   },
   'camera/ADD_IMAGE': (state, payload) => {
     state.camera.images.push(payload)
@@ -101,7 +102,16 @@ const Camera = connect(state => ({
             }}
             style={{ display: 'none' }}
           />
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', marginTop: 16, marginBottom: 16}}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '100%',
+              marginTop: 16,
+              marginBottom: 16
+            }}
+          >
             <button
               style={{
                 paddingTop: 8,
@@ -120,7 +130,9 @@ const Camera = connect(state => ({
                 cursor: 'pointer'
               }}
               type={'button'}
-              onClick={this.handleClick}>Take Picture
+              onClick={this.handleClick}
+            >
+              Take Picture
             </button>
           </div>
 
@@ -154,7 +166,7 @@ const ImageList = connect(state => ({
       }}
     >
       {images.map((image, i) => {
-        return <Image image={image} last={i === images.length - 1}/>
+        return <Image image={image} last={i === images.length - 1} />
       })}
     </div>
   )
@@ -170,7 +182,7 @@ function Image ({ image, last }) {
       }}
       href={image}
     >
-      <img src={image} style={{ width: '100%' }}/>
+      <img src={image} style={{ width: '100%' }} />
     </a>
   )
 }
