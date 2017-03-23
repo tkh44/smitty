@@ -187,6 +187,14 @@ function Image ({ image, last }) {
   )
 }
 
+function GithubRibbon () {
+  return (
+    <iframe src="https://ghbtns.com/github-btn.html?user=tkh44&repo=smitty&type=star&count=true&size=large"
+            frameborder="0" scrolling="0" width="160px" height="30px"
+            style={{ marginLeft: 'auto' }}></iframe>
+  )
+}
+
 const App = connect(state => state)(props => (
   <div style={{ display: 'flex' }}>
     <Camera />
@@ -200,6 +208,15 @@ const App = connect(state => state)(props => (
         WebkitOverflowScrolling: 'touch'
       }}
     >
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        borderBottom: '1px solid #dee2e6'
+      }}>
+        <h2>Smitty Demo</h2>
+        <a href={'https://github.com/tkh44/smitty/tree/master/demo/src'} style={{ fontSize: '1rem', color: '#329af0', marginLeft: 8 }} target={'_blank'}>source</a>
+        <GithubRibbon />
+      </div>
       <ImageList />
     </div>
   </div>
