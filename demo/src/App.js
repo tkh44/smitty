@@ -3,6 +3,7 @@ import './style.css'
 import { render, h, Component } from 'preact'
 import { Provider, connect } from 'preact-smitty'
 import { createStore } from '../../src'
+import source from 'raw-loader!./App.js'
 
 const store = createStore({
   camera: {
@@ -12,71 +13,68 @@ const store = createStore({
   }
 })
 
-const recordVideo = (emit, { camera }) => {
-  if (camera.recording) {
-    emit('camera/STOP_RECORDING')
-    return
-  }
+store.createActions({
+  startMediaStream: () => async store => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: false,
+        video: true
+      })
+      store.actions.mediaStreamSuccess(stream)
+    } catch (err) {
+      store.actions.mediaStreamError(err)
+    }
+  },
+  mediaStreamSuccess: 'camera/STREAM_SUCCESS',
+  mediaStreamError: 'camera/STREAM_ERROR',
+  addImage: 'camera/ADD_IMAGE'
+})
 
-  emit('camera/START_RECORDING')
-
-  navigator.mediaDevices
-    .getUserMedia({
-      audio: true,
-      video: { width: 1280, height: 720 }
-    })
-    .then(stream => {
-      emit('camera/SET_STREAM_SUCCESS', stream)
-    })
-    .catch(err => {
-      emit('camera/SET_STREAM_ERROR', err)
-    })
-}
-
-store.addReducer({
-  'camera/START_RECORDING': state => {
-    state.camera.recording = true
+store.handleActions({
+  [store.actions.mediaStreamSuccess]: (state, stream) => {
+    state.camera.stream = stream
   },
-  'camera/STOP_RECORDING': state => {
-    state.camera.recording = false
+  [store.actions.mediaStreamError]: (state, error) => {
+    state.camera.streamError = error
   },
-  'camera/SET_STREAM_SUCCESS': (state, payload) => {
-    state.camera.stream = payload
-  },
-  'camera/SET_STREAM_ERROR': (state, payload) => {
-    state.camera.streamError = payload
-  },
-  'camera/ADD_IMAGE': (state, payload) => {
-    state.camera.images.push(payload)
+  [store.actions.addImage]: (state, image) => {
+    state.camera.images.push(image)
   }
 })
 
 const pp = obj => JSON.stringify(obj, null, 2)
 
 const Camera = connect(state => ({
-  stream: state.camera.stream
+  stream: state.camera.stream,
+  streamError: state.camera.streamError
 }))(
   class Camera extends Component {
     video = null;
     canvas = null;
 
     componentDidMount () {
-      this.props.emit(recordVideo)
+      const action = this.context.store.actions.startMediaStream('test')
+      action()
     }
 
-    render () {
+    render ({ streamError }) {
       return (
         <div
           style={{
-            width: '50vw',
-            minHeight: '100vh',
-            background: '#212529',
             paddingTop: 16,
             paddingRight: 16,
             paddingBottom: 16,
             paddingLeft: 16
           }}
         >
+          <h3 style={{
+            height: streamError ? 24 : 0,
+            lineHeight: '1.2',
+            marginBottom: 16,
+            textAlign: 'center', color: '#ff6b6b',
+            opacity: streamError ? 1 : 0,
+            transition: 'all 250ms ease-in-out'
+          }}>{streamError ? streamError.name : ''}</h3>
           <video
             ref={node => {
               this.video = node
@@ -127,8 +125,11 @@ const Camera = connect(state => ({
                 outline: 'none',
                 boxShadow: 'none',
                 borderRadius: 5,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                opacity: streamError ? 0 : 1,
+                transition: 'all 250ms ease-in-out'
               }}
+              disabled={streamError}
               type={'button'}
               onClick={this.handleClick}
             >
@@ -150,7 +151,7 @@ const Camera = connect(state => ({
       ctx.fillRect(0, 0, width, height)
       ctx.drawImage(this.video, 0, 0, width, height)
 
-      this.props.emit('camera/ADD_IMAGE', canvas.toDataURL('image/webp'))
+      this.context.store.actions.addImage(canvas.toDataURL('image/webp'))
     };
   }
 )
@@ -162,23 +163,24 @@ const ImageList = connect(state => ({
     <div
       style={{
         display: 'flex',
-        flexFlow: 'wrap-reverse'
+        flexFlow: 'wrap'
       }}
     >
       {images.map((image, i) => {
-        return <Image image={image} last={i === images.length - 1} />
+        return <Image image={image} index={i} />
       })}
     </div>
   )
 })
 
-function Image ({ image, last }) {
+function Image ({ image, index }) {
   return (
     <a
       style={{
         position: 'relative',
-        flex: '1 0 auto',
-        width: last ? '100%' : '33%'
+        flex: '0 0 auto',
+        width: '33%',
+        order: index * -1
       }}
       href={image}
     >
@@ -189,15 +191,34 @@ function Image ({ image, last }) {
 
 function GithubRibbon () {
   return (
-    <iframe src="https://ghbtns.com/github-btn.html?user=tkh44&repo=smitty&type=star&count=true&size=large"
-            frameborder="0" scrolling="0" width="160px" height="30px"
-            style={{ marginLeft: 'auto' }}></iframe>
+    <iframe
+      src='https://ghbtns.com/github-btn.html?user=tkh44&amp;repo=smitty&amp;type=star&amp;count=true&amp;size=large'
+      frameborder='0'
+      scrolling='0'
+      width='160px'
+      height='30px'
+      style={{ marginLeft: 'auto' }}
+    />
   )
 }
 
 const App = connect(state => state)(props => (
   <div style={{ display: 'flex' }}>
-    <Camera />
+    <div
+      style={{
+        flex: '1 0 50%',
+        height: '100vh',
+        background: '#212529',
+        overflow: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        background: props.camera.streamError ? '#f8f9fa' : '#212529',
+        cursor: 'pointer',
+        transition: 'all 250ms ease-in-out'
+      }}
+    >
+      <Camera />
+    </div>
+
     <div
       style={{
         flex: '1 0 50%',
@@ -208,13 +229,23 @@ const App = connect(state => state)(props => (
         WebkitOverflowScrolling: 'touch'
       }}
     >
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        borderBottom: '1px solid #dee2e6'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          borderBottom: '1px solid #dee2e6',
+          paddingRight: 8,
+          paddingLeft: 8
+        }}
+      >
         <h2>Smitty Demo</h2>
-        <a href={'https://github.com/tkh44/smitty/tree/master/demo/src'} style={{ fontSize: '1rem', color: '#329af0', marginLeft: 8 }} target={'_blank'}>source</a>
+        <a
+          href={'https://github.com/tkh44/smitty/tree/master/demo/src'}
+          style={{ fontSize: '1rem', color: '#329af0', marginLeft: 8 }}
+          target={'_blank'}
+        >
+          source
+        </a>
         <GithubRibbon />
       </div>
       <ImageList />

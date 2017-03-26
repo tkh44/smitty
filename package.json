@@ -26,6 +26,7 @@
     "nwb": "0.15.x",
     "preact": "^7.2.0",
     "preact-smitty": "0.0.4",
+    "raw-loader": "^0.5.1",
     "react": "^16.0.0-alpha.5",
     "react-dom": "^16.0.0-alpha.5"
   },

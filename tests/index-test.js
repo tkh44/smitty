@@ -18,7 +18,7 @@ describe('smitty', () => {
 
   it('reducer is called with prev state and event data', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e, type) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 'bar' })
@@ -34,7 +34,7 @@ describe('smitty', () => {
 
   it('handles * event type', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e, type) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 5 })
@@ -55,7 +55,7 @@ describe('smitty', () => {
 
   it('no return from reducer is acceptable', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         state.foo += 5
       }
@@ -68,7 +68,7 @@ describe('smitty', () => {
 
   it('reducers are called in order with updated state', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 'bar' })
@@ -76,7 +76,7 @@ describe('smitty', () => {
       }
     })
 
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(6)
         expect(e).toEqual({ foo: 'bar' })
@@ -91,7 +91,7 @@ describe('smitty', () => {
 
   it('emit accepts a function argument and calls it with state and emit', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual(5)
@@ -118,7 +118,7 @@ describe('smitty', () => {
     class HistoryReducer {
       constructor (initialHistory = []) {
         this.history = createStore(initialHistory)
-        this.history.addReducer({
+        this.history.handleActions({
           update: (state, e) => {
             state.push(e)
           }
@@ -136,7 +136,7 @@ describe('smitty', () => {
     }
 
     const historyReducer = new HistoryReducer([])
-    store.addReducer(historyReducer)
+    store.handleActions(historyReducer)
 
     store.emit('foo/ADD', { foo: 5 })
     expect(store.state.foo).toBe(10)
