@@ -19,7 +19,7 @@
     "deploy": "npm run build && gh-pages -d demo/dist"
   },
   "peerDependencies": {
-    "mitt": "^1.1.0"
+    "events": "^1.1.0"
   },
   "devDependencies": {
     "gh-pages": "^0.12.0",

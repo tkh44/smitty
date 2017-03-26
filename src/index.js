@@ -1,29 +1,37 @@
 import mitt from 'mitt'
 
-class Store {
-  constructor (initialState) {
-    this._state = initialState
-    this.actions = {}
-    this.events = mitt()
-    this.on = this.events.on
-    this.off = this.events.off
-    this.emit = this.emit.bind(this)
-    this.handleActions = this.handleActions.bind(this)
-  }
+function Store (initialState) {
+  let _state = initialState
+  this.actions = {}
+  this.events = mitt()
+  this.on = this.events.on
+  this.off = this.events.off
+  this.emit = this.emit.bind(this)
+  this.handleActions = this.handleActions.bind(this)
 
+  Object.defineProperty(this, 'state', {
+    get: function () {
+      return _state
+    },
+    set: function (value) {
+      _state = value
+    }
+  })
+}
+
+Object.assign(Store.prototype, {
   get state () {
     return this._state
-  }
+  },
 
   set state (nextState) {
     this._state = nextState
-  }
+  },
 
   emit (type, payload) {
-    console.log(type)
     if (typeof type === 'function') return type(this)
     this.events.emit(type, payload)
-  }
+  },
 
   createAction (type) {
     if (typeof type === 'function') {
@@ -33,13 +41,13 @@ class Store {
     const actionCreator = payload => this.emit(type, payload)
     actionCreator.toString = () => type.toString()
     return actionCreator
-  }
+  },
 
   createActions (actionMap) {
     for (let creatorName in actionMap) {
       this.actions[creatorName] = this.createAction(actionMap[creatorName])
     }
-  }
+  },
 
   handleActions (handlerMap) {
     for (let type in handlerMap) {
@@ -54,7 +62,9 @@ class Store {
       this.events.on(type, handler)
     }
   }
-}
+})
+
+
 
 export function createStore (initialState) {
   return new Store(initialState)

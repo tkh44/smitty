@@ -12,7 +12,7 @@ describe('smitty', () => {
     expect(createStore({ foo: 5 }).state).toEqual({ foo: 5 })
   })
 
-  it('exposes the mitt api', () => {
+  it('exposes the events api', () => {
     expect(createStore()).toIncludeKeys(Object.keys(mitt()))
   })
 
@@ -126,7 +126,7 @@ describe('smitty', () => {
       }
 
       onUpdate (state, e, type) {
-        this.history.emit('update', { state, e, type })
+        this.history.emit('update', { state, events, type })
       }
     }
 
@@ -145,7 +145,7 @@ describe('smitty', () => {
         state: {
           foo: 10
         },
-        e: {
+        events: {
           foo: 5
         },
         type: 'foo/ADD'

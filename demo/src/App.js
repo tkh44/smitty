@@ -53,8 +53,7 @@ const Camera = connect(state => ({
     canvas = null;
 
     componentDidMount () {
-      const action = this.context.store.actions.startMediaStream('test')
-      action()
+      this.context.store.actions.startMediaStream('test')
     }
 
     render ({ streamError }) {
