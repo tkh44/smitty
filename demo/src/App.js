@@ -215,7 +215,8 @@ const ImageList = connect(state => ({
     <div
       style={{
         display: 'flex',
-        flexFlow: 'wrap'
+        flexFlow: 'wrap',
+        perspective: '1000px'
       }}
     >
       {images.map((image, i) => {
@@ -267,6 +268,7 @@ function Image ({ image, index, onClick, selected }) {
   return (
     <a
       style={wrapperStyles}
+      class={selected ? 'animate-in' : ''}
       href={image.url}
       target={'_blank'}
       onClick={e => {

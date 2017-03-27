@@ -1,6 +1,6 @@
 module.exports = {
   type: 'react-component',
-  polyfill: false,
+  // polyfill: false,
   npm: {
     esModules: true,
     umd: {
@@ -12,7 +12,7 @@ module.exports = {
   },
   babel: {
     loose: true,
-    runtime: false
+    runtime: true
   },
   webpack: {
     uglify: {
