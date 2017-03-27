@@ -4,6 +4,12 @@ import { render, h, Component } from 'preact'
 import { Provider, connect } from 'preact-smitty'
 import { createStore } from '../../src'
 import source from 'raw-loader!./App.js'
+import localforage from 'localforage'
+
+localforage.config({ name: 'smitty_photo_booth' })
+
+const pp = obj => JSON.stringify(obj, null, 2)
+const getId = () => `${Math.random()}`
 
 const store = createStore({
   camera: {
@@ -14,20 +20,32 @@ const store = createStore({
 })
 
 store.createActions({
-  startMediaStream: () => async store => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: true
-      })
-      store.actions.mediaStreamSuccess(stream)
-    } catch (err) {
-      store.actions.mediaStreamError(err)
-    }
-  },
+  startMediaStream: constraints =>
+    async store => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints)
+        store.actions.mediaStreamSuccess(stream)
+      } catch (err) {
+        store.actions.mediaStreamError(err)
+      }
+    },
   mediaStreamSuccess: 'camera/STREAM_SUCCESS',
   mediaStreamError: 'camera/STREAM_ERROR',
-  addImage: 'camera/ADD_IMAGE'
+  addImages: 'camera/ADD_IMAGES',
+  saveImage: url =>
+    store => {
+      const id = getId()
+      const image = { id, url }
+      store.actions.addImages([image])
+
+      localforage
+        .getItem('images')
+        .then(images => {
+          images.push(image)
+          localforage.setItem('images', images)
+        })
+        .catch(err => console.log('Could not save image to db', err))
+    }
 })
 
 store.handleActions({
@@ -37,12 +55,18 @@ store.handleActions({
   [store.actions.mediaStreamError]: (state, error) => {
     state.camera.streamError = error
   },
-  [store.actions.addImage]: (state, image) => {
-    state.camera.images.push(image)
+  [store.actions.addImages]: (state, images) => {
+    state.camera.images = state.camera.images.concat(images)
   }
 })
 
-const pp = obj => JSON.stringify(obj, null, 2)
+localforage.getItem('images').then(images => {
+  if (images) {
+    store.actions.addImages(images)
+  } else {
+    localforage.setItem('images', [])
+  }
+})
 
 const Camera = connect(state => ({
   stream: state.camera.stream,
@@ -53,7 +77,10 @@ const Camera = connect(state => ({
     canvas = null;
 
     componentDidMount () {
-      this.context.store.actions.startMediaStream('test')
+      this.context.store.actions.startMediaStream({
+        audio: false,
+        video: true
+      })
     }
 
     render ({ streamError }) {
@@ -66,14 +93,19 @@ const Camera = connect(state => ({
             paddingLeft: 16
           }}
         >
-          <h3 style={{
-            height: streamError ? 24 : 0,
-            lineHeight: '1.2',
-            marginBottom: 16,
-            textAlign: 'center', color: '#ff6b6b',
-            opacity: streamError ? 1 : 0,
-            transition: 'all 250ms ease-in-out'
-          }}>{streamError ? streamError.name : ''}</h3>
+          <h3
+            style={{
+              height: streamError ? 24 : 0,
+              lineHeight: '1.2',
+              marginBottom: 16,
+              textAlign: 'center',
+              color: '#ff6b6b',
+              opacity: streamError ? 1 : 0,
+              transition: 'all 250ms ease-in-out'
+            }}
+          >
+            {streamError ? streamError.name : ''}
+          </h3>
           <video
             ref={node => {
               this.video = node
@@ -150,7 +182,7 @@ const Camera = connect(state => ({
       ctx.fillRect(0, 0, width, height)
       ctx.drawImage(this.video, 0, 0, width, height)
 
-      this.context.store.actions.addImage(canvas.toDataURL('image/webp'))
+      this.context.store.actions.saveImage(canvas.toDataURL('image/webp'))
     };
   }
 )
@@ -166,7 +198,7 @@ const ImageList = connect(state => ({
       }}
     >
       {images.map((image, i) => {
-        return <Image image={image} index={i} />
+        return <Image key={image.id} image={image} index={i} />
       })}
     </div>
   )
@@ -181,9 +213,9 @@ function Image ({ image, index }) {
         width: '33%',
         order: index * -1
       }}
-      href={image}
+      href={image.url}
     >
-      <img src={image} style={{ width: '100%' }} />
+      <img src={image.url} style={{ width: '100%' }} />
     </a>
   )
 }
@@ -237,7 +269,7 @@ const App = connect(state => state)(props => (
           paddingLeft: 8
         }}
       >
-        <h2>Smitty Demo</h2>
+        <h2>Smitty Photo Booth Demo</h2>
         <a
           href={'https://github.com/tkh44/smitty/tree/master/demo/src'}
           style={{ fontSize: '1rem', color: '#329af0', marginLeft: 8 }}
