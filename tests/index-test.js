@@ -174,7 +174,7 @@ describe('smitty', () => {
     store.actions.start()
   })
 
-  it('`store:change` event is fired after a state change', done => {
+  it('`$$store:state:change` event is fired after action handler is called', done => {
     const store = createStore({ foo: 5 })
 
     store.createActions({
@@ -191,7 +191,7 @@ describe('smitty', () => {
       }
     })
 
-    store.events.on('store:change', (state) => {
+    store.events.on('$$store:state:change', (state) => {
       expect(state.foo).toEqual(10)
       done()
     })

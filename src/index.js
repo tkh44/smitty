@@ -42,11 +42,9 @@ Object.assign(Store.prototype, {
   handleActions (handlerMap) {
     for (let type in handlerMap) {
       let handler = (eventType, e) => {
-        if (eventType.substring(0, 6) === 'store:') return
-        const nextState = handlerMap[type](this.state, e, eventType) || this.state
-        if (this.state !== nextState) {
-          this.events.emit('store:state:change', this.state)
-        }
+        if (eventType.substring(0, 8) === '$$store:') return
+        this.state = handlerMap[type](this.state, e, eventType) || this.state
+        this.events.emit('$$store:state:change', this.state)
       }
       if (type !== '*') {
         handler = handler.bind(null, type)
