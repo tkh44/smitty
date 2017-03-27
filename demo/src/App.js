@@ -9,13 +9,16 @@ import localforage from 'localforage'
 localforage.config({ name: 'smitty_photo_booth' })
 
 const pp = obj => JSON.stringify(obj, null, 2)
-const getId = () => `${Math.random()}`
+const getId = () => new Date().toString()
 
 const store = createStore({
   camera: {
     recording: false,
     stream: new window.MediaStream(),
     images: []
+  },
+  ui: {
+    selectedImageId: null
   }
 })
 
@@ -45,7 +48,12 @@ store.createActions({
           localforage.setItem('images', images)
         })
         .catch(err => console.log('Could not save image to db', err))
-    }
+    },
+  selectImage: (id) => store => {
+    store.actions.setSelectedImageById(id)
+    window.history.pushState({}, '', id || '/')
+  },
+  setSelectedImageById: 'ui/SELECT_IMAGE'
 })
 
 store.handleActions({
@@ -57,6 +65,9 @@ store.handleActions({
   },
   [store.actions.addImages]: (state, images) => {
     state.camera.images = state.camera.images.concat(images)
+  },
+  [store.actions.setSelectedImageById]: (state, imageId) => {
+    state.ui.selectedImageId = imageId
   }
 })
 
@@ -67,6 +78,15 @@ localforage.getItem('images').then(images => {
     localforage.setItem('images', [])
   }
 })
+
+
+if (window.location.pathname !== '/') {
+  store.actions.setSelectedImageById(decodeURI(window.location.pathname).split('/')[1])
+}
+
+window.onpopstate = function (event) {
+  store.actions.setSelectedImageById(decodeURI(window.location.pathname).split('/')[1])
+}
 
 const Camera = connect(state => ({
   stream: state.camera.stream,
@@ -188,8 +208,9 @@ const Camera = connect(state => ({
 )
 
 const ImageList = connect(state => ({
-  images: state.camera.images
-}))(function ImageList ({ images }) {
+  images: state.camera.images,
+  selectedImageId: state.ui.selectedImageId
+}))(function ImageList ({ images, selectedImageId }, { store }) {
   return (
     <div
       style={{
@@ -198,25 +219,62 @@ const ImageList = connect(state => ({
       }}
     >
       {images.map((image, i) => {
-        return <Image key={image.id} image={image} index={i} />
+        return (
+          <Image
+            key={image.id}
+            image={image}
+            index={i}
+            selected={image.id === selectedImageId}
+            onClick={() => {
+              store.actions.selectImage(image.id === selectedImageId ? null : image.id)
+            }}
+          />
+        )
       })}
     </div>
   )
 })
 
-function Image ({ image, index }) {
+function Image ({ image, index, onClick, selected }) {
+  const wrapperStyles = selected
+    ? {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: '#f8f9fa',
+      zIndex: 10
+    }
+    : {
+      position: 'relative',
+      flex: '0 1 auto',
+      width: 'calc(33% - 4px)',
+      order: index * -1,
+      paddingTop: 2,
+      paddingRight: 2,
+      paddingBottom: 0,
+      paddingLeft: 2
+    }
+
+  const imgStyles = selected ? { width: '90%', maxHeight: '90%', borderRadius: 8 } : { width: '100%', borderRadius: 4 }
+
   return (
     <a
-      style={{
-        position: 'relative',
-        flex: '0 0 auto',
-        width: '33%',
-        order: index * -1
-      }}
+      style={wrapperStyles}
       href={image.url}
       target={'_blank'}
+      onClick={e => {
+        e.preventDefault()
+        onClick()
+      }}
     >
-      <img src={image.url} style={{ width: '100%' }} />
+      <img src={image.url} style={imgStyles} />
     </a>
   )
 }
