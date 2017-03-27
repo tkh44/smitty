@@ -214,6 +214,7 @@ function Image ({ image, index }) {
         order: index * -1
       }}
       href={image.url}
+      target={'_blank'}
     >
       <img src={image.url} style={{ width: '100%' }} />
     </a>
