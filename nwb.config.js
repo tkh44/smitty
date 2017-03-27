@@ -1,6 +1,9 @@
 module.exports = {
   type: 'react-component',
   polyfill: false,
+  karma: {
+    browsers: ['Chrome']
+  },
   npm: {
     esModules: true,
     umd: {

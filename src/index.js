@@ -20,32 +20,22 @@ function Store (initialState) {
 }
 
 Object.assign(Store.prototype, {
-  get state () {
-    return this._state
-  },
-
-  set state (nextState) {
-    this._state = nextState
-  },
-
   emit (type, payload) {
     if (typeof type === 'function') return type(this)
     this.events.emit(type, payload)
   },
 
-  createAction (type) {
-    if (typeof type === 'function') {
-      return payload => this.emit(type(payload))
-    }
-
-    const actionCreator = payload => this.emit(type, payload)
-    actionCreator.toString = () => type.toString()
-    return actionCreator
-  },
-
   createActions (actionMap) {
     for (let creatorName in actionMap) {
-      this.actions[creatorName] = this.createAction(actionMap[creatorName])
+      const type = actionMap[creatorName]
+      let actionCreator
+      if (typeof type === 'function') {
+        actionCreator = payload => this.emit(type(payload))
+      } else {
+        actionCreator = payload => this.emit(type, payload)
+        actionCreator.toString = () => type.toString()
+      }
+      this.actions[creatorName] = actionCreator
     }
   },
 
@@ -63,8 +53,6 @@ Object.assign(Store.prototype, {
     }
   }
 })
-
-
 
 export function createStore (initialState) {
   return new Store(initialState)

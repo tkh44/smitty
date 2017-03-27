@@ -89,7 +89,7 @@ describe('smitty', () => {
     done()
   })
 
-  it('emit accepts a function argument and calls it with state and emit', done => {
+  it('emit accepts a function argument and calls it with store', done => {
     const store = createStore({ foo: 5 })
     store.handleActions({
       'foo/ADD': (state, e) => {
@@ -100,11 +100,9 @@ describe('smitty', () => {
     })
 
     const action = amount =>
-      (emit, state) => {
-        expect(emit).toExist()
-        expect(state).toExist()
-
-        emit('foo/ADD', amount)
+      (storeArg) => {
+        expect(storeArg).toBe(store)
+        storeArg.emit('foo/ADD', amount)
         expect(store.state.foo).toBe(10)
         done()
       }
@@ -125,7 +123,7 @@ describe('smitty', () => {
         })
       }
 
-      onUpdate (state, e, type) {
+      onUpdate (state, events, type) {
         this.history.emit('update', { state, events, type })
       }
     }
@@ -152,5 +150,52 @@ describe('smitty', () => {
       }
     ])
     done()
+  })
+
+  it('createActions', done => {
+    const store = createStore({ foo: 5 })
+
+    store.createActions({
+      start: () => (store) => {
+        store.emit(store.actions.add(5))
+      },
+      add: 'foo/ADD'
+    })
+
+    store.handleActions({
+      [store.actions.add]: (state, e) => {
+        expect(state.foo).toBe(5)
+        state.foo += e
+        expect(state.foo).toEqual(10)
+        done()
+      }
+    })
+
+    store.actions.start()
+  })
+
+  it('`store:change` event is fired after a state change', done => {
+    const store = createStore({ foo: 5 })
+
+    store.createActions({
+      start: () => (store) => {
+        store.emit(store.actions.add(5))
+      },
+      add: 'foo/ADD'
+    })
+
+    store.handleActions({
+      [store.actions.add]: (state, e) => {
+        expect(state.foo).toBe(5)
+        state.foo += e
+      }
+    })
+
+    store.events.on('store:change', (state) => {
+      expect(state.foo).toEqual(10)
+      done()
+    })
+
+    store.actions.start()
   })
 })
