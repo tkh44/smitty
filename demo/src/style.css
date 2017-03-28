@@ -13,15 +13,15 @@ body {
   animation: up-in;
   animation-duration: 250ms;
   animation-fill-mode: forwards;
-  animation-timing-function: cubic-bezier(0.39, 0.04, 0.2, 1);
+  animation-timing-function: cubic-bezier(0, 0.72, 0, 1.02);
   will-change: transform;
-  transform: translate3d(0, 0, -100px);
+  transform: translate3d(0, 0, -200px);
   opacity: 0.5;
 }
 
 @keyframes up-in {
   from {
-    transform: translate3d(0, 0, -100px);
+    transform: translate3d(0, 0, -200px);
     opacity: 0.5;
   }
 

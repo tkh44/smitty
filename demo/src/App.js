@@ -13,7 +13,6 @@ const getId = () => new Date().toString()
 
 const store = createStore({
   camera: {
-    recording: false,
     stream: new window.MediaStream(),
     images: []
   },
@@ -49,10 +48,11 @@ store.createActions({
         })
         .catch(err => console.log('Could not save image to db', err))
     },
-  selectImage: (id) => store => {
-    store.actions.setSelectedImageById(id)
-    window.history.pushState({}, '', id || '/')
-  },
+  selectImage: id =>
+    store => {
+      store.actions.setSelectedImageById(id)
+      window.history.pushState({}, '', id || '/smitty/')
+    },
   setSelectedImageById: 'ui/SELECT_IMAGE'
 })
 
@@ -79,13 +79,16 @@ localforage.getItem('images').then(images => {
   }
 })
 
-
 if (window.location.pathname !== '/') {
-  store.actions.setSelectedImageById(decodeURI(window.location.pathname).split('/')[1])
+  store.actions.setSelectedImageById(
+    decodeURI(window.location.pathname).split('/smitty/')[1]
+  )
 }
 
 window.onpopstate = function (event) {
-  store.actions.setSelectedImageById(decodeURI(window.location.pathname).split('/')[1])
+  store.actions.setSelectedImageById(
+    decodeURI(window.location.pathname).split('/smitty/')[1]
+  )
 }
 
 const Camera = connect(state => ({
@@ -227,7 +230,9 @@ const ImageList = connect(state => ({
             index={i}
             selected={image.id === selectedImageId}
             onClick={() => {
-              store.actions.selectImage(image.id === selectedImageId ? null : image.id)
+              store.actions.selectImage(
+                image.id === selectedImageId ? null : image.id
+              )
             }}
           />
         )
@@ -245,10 +250,6 @@ function Image ({ image, index, onClick, selected }) {
       right: 0,
       bottom: 0,
       width: '100%',
-      height: '100%',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
       background: '#f8f9fa',
       zIndex: 10
     }
@@ -263,7 +264,9 @@ function Image ({ image, index, onClick, selected }) {
       paddingLeft: 2
     }
 
-  const imgStyles = selected ? { width: '90%', maxHeight: '90%', borderRadius: 8 } : { width: '100%', borderRadius: 4 }
+  const imgStyles = selected
+    ? { display: 'block', width: '90%', borderRadius: 8, margin: '16px auto' }
+    : { width: '100%', borderRadius: 4 }
 
   return (
     <a
@@ -294,7 +297,7 @@ function GithubRibbon () {
   )
 }
 
-const App = connect(state => state)(props => (
+const App = connect(state => ({ state }))(props => (
   <div style={{ display: 'flex' }}>
     <div
       style={{
@@ -303,12 +306,19 @@ const App = connect(state => state)(props => (
         background: '#212529',
         overflow: 'auto',
         WebkitOverflowScrolling: 'touch',
-        background: props.camera.streamError ? '#f8f9fa' : '#212529',
+        background: props.state.camera.streamError ? '#f8f9fa' : '#212529',
         cursor: 'pointer',
         transition: 'all 250ms ease-in-out'
       }}
     >
       <Camera />
+      <div style={{ color: '#adb5bd' }}>
+        <h3>Current State</h3>
+        <pre>
+          {pp(props.state)}
+        </pre>
+      </div>
+
     </div>
 
     <div
