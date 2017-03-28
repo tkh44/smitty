@@ -9,7 +9,7 @@ import localforage from 'localforage'
 localforage.config({ name: 'smitty_photo_booth' })
 
 const pp = obj => JSON.stringify(obj, null, 2)
-const getId = () => new Date().toString()
+const getId = () => new Date().getTime()
 
 const store = createStore({
   camera: {
@@ -219,7 +219,7 @@ const ImageList = connect(state => ({
       style={{
         display: 'flex',
         flexFlow: 'wrap',
-        perspective: '1000px'
+        // perspective: '1000px'
       }}
     >
       {images.map((image, i) => {
@@ -244,7 +244,7 @@ const ImageList = connect(state => ({
 function Image ({ image, index, onClick, selected }) {
   const wrapperStyles = selected
     ? {
-      position: 'fixed',
+      position: 'absolute',
       top: 0,
       left: 0,
       right: 0,
@@ -265,7 +265,7 @@ function Image ({ image, index, onClick, selected }) {
     }
 
   const imgStyles = selected
-    ? { display: 'block', width: '90%', borderRadius: 8, margin: '16px auto' }
+    ? { display: 'block', width: '90%', borderRadius: 8, margin: '64px auto' }
     : { width: '100%', borderRadius: 4 }
 
   return (
@@ -279,7 +279,7 @@ function Image ({ image, index, onClick, selected }) {
         onClick()
       }}
     >
-      <img src={image.url} style={imgStyles} />
+      <img src={image.url} className={'image'} style={imgStyles} />
     </a>
   )
 }
