@@ -1,35 +1,50 @@
 import mitt from 'mitt'
 
-class Store {
-  constructor (initialState) {
-    this._state = initialState
-    this.events = mitt()
-    this.on = this.events.on
-    this.off = this.events.off
-    this.emit = this.emit.bind(this)
-    this.addReducer = this.addReducer.bind(this)
-  }
+function Store (initialState) {
+  let _state = initialState
+  this.actions = {}
+  this.events = mitt()
+  this.on = this.events.on
+  this.off = this.events.off
+  this.emit = this.emit.bind(this)
+  this.handleActions = this.handleActions.bind(this)
 
-  get state () {
-    return this._state
-  }
+  Object.defineProperty(this, 'state', {
+    get: function () {
+      return _state
+    },
+    set: function (value) {
+      _state = value
+    }
+  })
+}
 
-  set state (nextState) {
-    this._state = nextState
-  }
-
+Object.assign(Store.prototype, {
   emit (type, payload) {
-    if (typeof type === 'function') return type(this.emit, this.state)
+    if (typeof type === 'function') return type(this)
     this.events.emit(type, payload)
-  }
+  },
 
-  addReducer (reducer) {
-    for (let type in reducer) {
-      let handler
-      handler = (eventType, e) => {
-        if (eventType.substring(0, 6) === 'store:') return
-        this.state = reducer[type](this.state, e, eventType) || this.state
-        this.events.emit('store:change', this.state)
+  createActions (actionMap) {
+    for (let creatorName in actionMap) {
+      const type = actionMap[creatorName]
+      let actionCreator
+      if (typeof type === 'function') {
+        actionCreator = payload => this.emit(type(payload))
+      } else {
+        actionCreator = payload => this.emit(type, payload)
+        actionCreator.toString = () => type.toString()
+      }
+      this.actions[creatorName] = actionCreator
+    }
+  },
+
+  handleActions (handlerMap) {
+    for (let type in handlerMap) {
+      let handler = (eventType, e) => {
+        if (eventType.substring(0, 8) === '$$store:') return
+        this.state = handlerMap[type](this.state, e, eventType) || this.state
+        this.events.emit('$$store:state:change', this.state)
       }
       if (type !== '*') {
         handler = handler.bind(null, type)
@@ -37,7 +52,7 @@ class Store {
       this.events.on(type, handler)
     }
   }
-}
+})
 
 export function createStore (initialState) {
   return new Store(initialState)

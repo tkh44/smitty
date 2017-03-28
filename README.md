@@ -307,8 +307,8 @@ console.log(store.state.foo) // logs 17
 console.log(historyReducer.history.state)
 // logs
 // [
-//   { state: { foo: 10 }, e: { foo: 5 }, type: 'foo/ADD' },
-//   { state: { foo: 17 }, e: { foo: 7 }, type: 'foo/ADD' }
+mitt
+mitt
 // ]
 
 ```

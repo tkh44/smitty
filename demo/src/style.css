@@ -8,3 +8,25 @@ body {
   color: #343a40;
   overflow: hidden;
 }
+
+.animate-in {
+  animation: up-in;
+  animation-duration: 250ms;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.39, 0.04, 0.2, 1);
+  will-change: transform;
+  transform: translate3d(0, 0, -100px);
+  opacity: 0.5;
+}
+
+@keyframes up-in {
+  from {
+    transform: translate3d(0, 0, -100px);
+    opacity: 0.5;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}

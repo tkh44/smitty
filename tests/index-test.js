@@ -12,13 +12,13 @@ describe('smitty', () => {
     expect(createStore({ foo: 5 }).state).toEqual({ foo: 5 })
   })
 
-  it('exposes the mitt api', () => {
+  it('exposes the events api', () => {
     expect(createStore()).toIncludeKeys(Object.keys(mitt()))
   })
 
   it('reducer is called with prev state and event data', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e, type) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 'bar' })
@@ -34,7 +34,7 @@ describe('smitty', () => {
 
   it('handles * event type', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e, type) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 5 })
@@ -55,7 +55,7 @@ describe('smitty', () => {
 
   it('no return from reducer is acceptable', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         state.foo += 5
       }
@@ -68,7 +68,7 @@ describe('smitty', () => {
 
   it('reducers are called in order with updated state', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual({ foo: 'bar' })
@@ -76,7 +76,7 @@ describe('smitty', () => {
       }
     })
 
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(6)
         expect(e).toEqual({ foo: 'bar' })
@@ -89,9 +89,9 @@ describe('smitty', () => {
     done()
   })
 
-  it('emit accepts a function argument and calls it with state and emit', done => {
+  it('emit accepts a function argument and calls it with store', done => {
     const store = createStore({ foo: 5 })
-    store.addReducer({
+    store.handleActions({
       'foo/ADD': (state, e) => {
         expect(state.foo).toBe(5)
         expect(e).toEqual(5)
@@ -100,11 +100,9 @@ describe('smitty', () => {
     })
 
     const action = amount =>
-      (emit, state) => {
-        expect(emit).toExist()
-        expect(state).toExist()
-
-        emit('foo/ADD', amount)
+      (storeArg) => {
+        expect(storeArg).toBe(store)
+        storeArg.emit('foo/ADD', amount)
         expect(store.state.foo).toBe(10)
         done()
       }
@@ -118,15 +116,15 @@ describe('smitty', () => {
     class HistoryReducer {
       constructor (initialHistory = []) {
         this.history = createStore(initialHistory)
-        this.history.addReducer({
+        this.history.handleActions({
           update: (state, e) => {
             state.push(e)
           }
         })
       }
 
-      onUpdate (state, e, type) {
-        this.history.emit('update', { state, e, type })
+      onUpdate (state, events, type) {
+        this.history.emit('update', { state, events, type })
       }
     }
 
@@ -136,7 +134,7 @@ describe('smitty', () => {
     }
 
     const historyReducer = new HistoryReducer([])
-    store.addReducer(historyReducer)
+    store.handleActions(historyReducer)
 
     store.emit('foo/ADD', { foo: 5 })
     expect(store.state.foo).toBe(10)
@@ -145,12 +143,59 @@ describe('smitty', () => {
         state: {
           foo: 10
         },
-        e: {
+        events: {
           foo: 5
         },
         type: 'foo/ADD'
       }
     ])
     done()
+  })
+
+  it('createActions', done => {
+    const store = createStore({ foo: 5 })
+
+    store.createActions({
+      start: () => (store) => {
+        store.emit(store.actions.add(5))
+      },
+      add: 'foo/ADD'
+    })
+
+    store.handleActions({
+      [store.actions.add]: (state, e) => {
+        expect(state.foo).toBe(5)
+        state.foo += e
+        expect(state.foo).toEqual(10)
+        done()
+      }
+    })
+
+    store.actions.start()
+  })
+
+  it('`$$store:state:change` event is fired after action handler is called', done => {
+    const store = createStore({ foo: 5 })
+
+    store.createActions({
+      start: () => (store) => {
+        store.emit(store.actions.add(5))
+      },
+      add: 'foo/ADD'
+    })
+
+    store.handleActions({
+      [store.actions.add]: (state, e) => {
+        expect(state.foo).toBe(5)
+        state.foo += e
+      }
+    })
+
+    store.events.on('$$store:state:change', (state) => {
+      expect(state.foo).toEqual(10)
+      done()
+    })
+
+    store.actions.start()
   })
 })
