@@ -36,9 +36,13 @@ import { createStore } from 'smitty'
 const initialState = { count: 0 }
 const store = createStore(initialState)
 
+store.createActions({
+  add: 'count/ADD'
+})
+
 // add a reducer
-store.addReducer({
-  'count/ADD': (state, e, type) => {
+store.handleActions({
+  [store.actions.add]: (state, e, type) => {
     // increment foos by amount
     return Object.assign({}, state, { count: state.count + e.amount })
   },
@@ -52,16 +56,18 @@ store.addReducer({
   }
 })
 
-store.emit('count/ADD', { amount: 5 })
+store.actions.add({ amount: 5 })
 
 console.log(store.state)  // logs `{ count: 5 }`
 ```
 ---
 
-## Demos
+## Demos (v2)
 - [Photo Booth](https://tkh44.github.io/smitty/)
   Demonstrates async api and saving parts of the store with [localforage](https://github.com/localForage/localForage)
   - [source](https://github.com/tkh44/smitty/blob/master/demo/src)
+  
+## Demos (v1)
 - Basic
   - [Object as state](http://codepen.io/tkh44/pen/zNNPPq)
   - [Map as state](http://codepen.io/tkh44/pen/xgqBmO)
@@ -112,105 +118,168 @@ console.log(store.state)  // logs `{ count: 5 }`
 
 **arguments**
  
- - **type**: (_string_ | _function_)
+**type**: (_string_ | _function_)
  
-    - [string], `type` determines which reducers are called.
-        
-        ```js
-        const store = createStore(0)
-        store.addReducer({
-          add: function (state, payload) {
-            return state + payload
-          }
-        })
-        console.log(store.state) // logs 0
-        store.emit('add', 1)
-        console.log(store.state) // logs 1
-        ```
-     
-    - [function] `type` becomes an action creator that is passed 2 arguments
-        
-        - **emit**: `store.emit`
-        - **state**: the store's current state
-        
-             _`state` is a getter property so it will always return the latest version. Short cut for getState()_ 
-        
-        This is useful to emit multiple actions from a single emit call.
-        
-        ```js
-        const store = createStore(0)
-        store.addReducer({
-          add: function (state, payload) {
-            return state + payload
-          }
-        })
-        function apiAction (emit, state) {
-          emit('add', 1)
-          console.log(state) // logs 1
-          setTimeout(() => {
-            emit('add', 1)
-            console.log(state) // logs 3
-          }, 100)
-          emit('add', 1)
-          console.log(state) // logs 2
-        }
-        ```
-
- - **payload**: (_any_) optional
-
-    payload to pass to your reducer
+- [string], `type` determines which reducers are called.
     
     ```js
-    const store = createStore({ name: 'Arrow' })
-    store.addReducer({
-      'update/NAME': function (state, payload) {
-        // I really don't care if you return a new state
-        // Nobody is judging. Do what your ❤️ tells you.
-        // Just be consistent
-        return Object.assign({}, state, payload)
+    const store = createStore(0)
+    store.handleActions({
+      add: function (state, payload) {
+        return state + payload
       }
     })
-    console.log(store.state) // logs { name: 'Arrow' }
-    store.emit('update/NAME', { name: 'River' })
-    console.log(store.state) // logs { name: 'River' }
+    console.log(store.state) // logs 0
+    store.emit('add', 1)
+    console.log(store.state) // logs 1
     ```
+ 
+- [function] `type` becomes an action creator that is passed 1 argument
     
-### addReducer: (_function_)
+    - **store**: **[Store](#store)**
+    
+    This is useful to emit multiple actions from a single emit call.
+    
+    ```js
+    const store = createStore(0)
+    store.handleActions({
+      add: function (state, payload) {
+        return state + payload
+      }
+    })
+    function asyncAction (emit, state) {
+      emit('add', 1)
+      console.log(state) // logs 1
+      setTimeout(() => {
+        emit('add', 1)
+        console.log(state) // logs 3
+      }, 100)
+      emit('add', 1)
+      console.log(state) // logs 2
+    }
+        ```
+
+**payload**: (_any_) optional
+
+payload to pass to your reducer
+
+```js
+const store = createStore({ name: 'Arrow' })
+store.handleActions({
+  'update/NAME': function (state, payload) {
+    // I really don't care if you return a new state
+    // Nobody is judging. Do what your ❤️ tells you.
+    // Just be consistent
+    return Object.assign({}, state, payload)
+  }
+})
+console.log(store.state) // logs { name: 'Arrow' }
+store.emit('update/NAME', { name: 'River' })
+console.log(store.state) // logs { name: 'River' }
+```
+
+### createActions(): (_function_)
 
 **arguments**
  
- - **reducer**: (_object_)
+**actionMap**: (_object_)
+    
+Object where key is the action creator's name and the value can be of type `string` or `function`.
+
+If the value is a `string`, an action creator is attached to `store.actions` as a function that accepts one argument, `payload`.
+
+```js
+store.createActions({
+  add: 'count/ADD'
+})
+
+// The following are functionally equivalent
+store.actions.add(1)
+
+store.emit('count/ADD', 1)
+
+```
+
+Action creators with a string value can be used as the key in your `actionMap` in `handleActions`.
+
+```javascript    
+store.createActions({
+  add: 'count/ADD'
+})
+
+// add a reducer
+store.handleActions({
+  [store.actions.add]: (state, e, type) => {
+    // increment foos by amount
+    return Object.assign({}, state, { count: state.count + e.amount })
+  }
+})
+
+store.actions.add({ amount: 5 })
+
+console.log(store.state)  // logs `{ count: 5 }`
+```
+
+
+If the value is a `function`, it must be a function that returns an action creator. For async action creators.
+
+```js
+store.createActions({
+  add: (amount) => {
+    return (store) => {
+      setTimeout(() => {
+       store.emit('count/ADD', amount)
+      }, 16)
+    }
+  }
+})
+
+store.actions.add(1)
+
+```
+
+### handleActions(): (_function_)
+
+**arguments**
  
-    Object with keys that correspond to action types passed to `emit`
-    
-    When an event is emitted and the key matches the type the reducer is invoked with 3 arguments.
+**handlerMap**: (_object_)
+ 
+Object with keys that correspond to action types passed to `emit`
 
-      - **state**: (_any_) the store's state getter
-      - **payload** (__any__) the payload that was emitted
-      - **type** (__string__) the type that was emitted
+When an event is emitted and the key matches the type the reducer is invoked with 3 arguments.
 
-    ```js
-    const store = createStore({ color: 'blue', hovered: false })
-    store.addReducer({
-      'merge': function (state, payload) {
-        return Object.assign({}, state, payload)
-      },
-      'overwrite': function (state, payload) {
-        return payload
-      },
-    
-      // Could do the same in one
-      // If you really miss redux do this and put a switch statement
-      '*': function(state, payload, type) {
-        return type === 'merge' ? Object.assign({}, state, payload) : payload
-      }
-    })
-    console.log(store.state) // logs { color: 'blue', hovered: false }
-    store.emit('merge', { color: 'red' })
-    console.log(store.state) // { color: 'red', hovered: false }
-    store.emit('overwrite', { color: 'green', hovered: true, highlighted: false })
-    console.log(store.state) // { color: 'green', hovered: true, highlighted: false 
-    ```
+  - **state**: (_any_) the store's state getter
+  - **payload** (__any__) the payload that was emitted
+  - **type** (__string__) the type that was emitted
+
+```js
+const store = createStore({ color: 'blue', hovered: false })
+store.handleActions({
+  'merge': function (state, payload) {
+    return Object.assign({}, state, payload)
+  },
+  'overwrite': function (state, payload) {
+    return payload
+  },
+
+  // Could do the same in one
+  // If you really miss redux do this and put a switch statement
+  '*': function(state, payload, type) {
+    return type === 'merge' ? Object.assign({}, state, payload) : payload
+  }
+})
+console.log(store.state) // logs { color: 'blue', hovered: false }
+store.emit('merge', { color: 'red' })
+console.log(store.state) // { color: 'red', hovered: false }
+store.emit('overwrite', { color: 'green', hovered: true, highlighted: false })
+console.log(store.state) // { color: 'green', hovered: true, highlighted: false 
+```
+
+### actions: (_object_)
+
+Map of all the actions created in `store.createActions`
+
+This is convenient so that you do not have to deal with action imports across your app.
 
 ### on: (_function_)
 
@@ -236,7 +305,7 @@ const initialState = {}
 const store = createStore(initialState)
 
 // add our reducer
-store.addReducer({
+store.handleActions({
   'api/GET_ROOM': (state, { id, res }) => {
     return {
       ...state,
@@ -280,7 +349,7 @@ const store = createStore({ foo: 5 })
 class HistoryReducer {
   constructor (initialHistory = []) {
     this.history = createStore(initialHistory)
-    this.history.addReducer({
+    this.history.handleActions({
       update: (state, e) => {
         state.push(e)
       }
@@ -298,7 +367,7 @@ HistoryReducer.prototype['foo/ADD'] = function (state, e, type) {
 }
 
 const historyReducer = new HistoryReducer([])
-store.addReducer(historyReducer)
+store.handleActions(historyReducer)
 
 store.emit('foo/ADD', { foo: 5 })
 console.log(store.state.foo) // logs 10
@@ -307,8 +376,8 @@ console.log(store.state.foo) // logs 17
 console.log(historyReducer.history.state)
 // logs
 // [
-mitt
-mitt
+//   { state: { foo: 10 }, e: { foo: 5 }, type: 'foo/ADD' },
+//   { state: { foo: 17 }, e: { foo: 7 }, type: 'foo/ADD' }
 // ]
 
 ```

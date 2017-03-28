@@ -129,6 +129,7 @@ describe('smitty', () => {
     }
 
     HistoryReducer.prototype['foo/ADD'] = function (state, e, type) {
+      expect(type).toBe('foo/ADD')
       state.foo += e.foo
       this.onUpdate(state, e, type)
     }
