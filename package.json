@@ -19,14 +19,13 @@
     "deploy": "npm run build && gh-pages -d demo/dist"
   },
   "peerDependencies": {
-    "events": "^1.1.0"
+    "mitt": '^1.0.0'
   },
   "devDependencies": {
     "gh-pages": "^0.12.0",
     "localforage": "^1.5.0",
     "nwb": "0.15.x",
     "preact": "^7.2.0",
-    "preact-smitty": "0.0.4",
     "raw-loader": "^0.5.1",
     "react": "^16.0.0-alpha.5",
     "react-dom": "^16.0.0-alpha.5"

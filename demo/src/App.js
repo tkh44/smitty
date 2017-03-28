@@ -1,10 +1,9 @@
 /** @jsx h */
 import './style.css'
 import { render, h, Component } from 'preact'
-import { Provider, connect } from 'preact-smitty'
-import { createStore } from '../../src'
-import source from 'raw-loader!./App.js'
 import localforage from 'localforage'
+import { createStore } from '../../src'
+import { Provider, connect } from './preact-smitty'
 
 localforage.config({ name: 'smitty_photo_booth' })
 
@@ -100,7 +99,7 @@ const Camera = connect(state => ({
     canvas = null;
 
     componentDidMount () {
-      this.context.store.actions.startMediaStream({
+      this.props.actions.startMediaStream({
         audio: false,
         video: true
       })
@@ -205,7 +204,7 @@ const Camera = connect(state => ({
       ctx.fillRect(0, 0, width, height)
       ctx.drawImage(this.video, 0, 0, width, height)
 
-      this.context.store.actions.saveImage(canvas.toDataURL('image/webp'))
+      this.props.actions.saveImage(canvas.toDataURL('image/webp'))
     };
   }
 )
@@ -213,7 +212,7 @@ const Camera = connect(state => ({
 const ImageList = connect(state => ({
   images: state.camera.images,
   selectedImageId: state.ui.selectedImageId
-}))(function ImageList ({ images, selectedImageId }, { store }) {
+}))(function ImageList ({ actions, images, selectedImageId }) {
   return (
     <div
       style={{
@@ -230,7 +229,7 @@ const ImageList = connect(state => ({
             index={i}
             selected={image.id === selectedImageId}
             onClick={() => {
-              store.actions.selectImage(
+              actions.selectImage(
                 image.id === selectedImageId ? null : image.id
               )
             }}
