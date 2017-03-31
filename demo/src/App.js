@@ -3,7 +3,7 @@ import './style.css'
 import { render, h, Component } from 'preact'
 import localforage from 'localforage'
 import { createStore } from '../../src'
-import { Provider, connect } from './preact-smitty'
+import { Provider, connect, track } from './preact-smitty'
 
 localforage.config({ name: 'smitty_photo_booth' })
 
@@ -90,155 +90,176 @@ window.onpopstate = function (event) {
   )
 }
 
-const Camera = connect(state => ({
-  stream: state.camera.stream,
-  streamError: state.camera.streamError
-}))(
-  class Camera extends Component {
-    video = null;
-    canvas = null;
-
-    componentDidMount () {
-      this.props.actions.startMediaStream({
-        audio: false,
-        video: true
-      })
-    }
-
-    render ({ streamError }) {
-      return (
-        <div
-          style={{
-            paddingTop: 16,
-            paddingRight: 16,
-            paddingBottom: 16,
-            paddingLeft: 16
-          }}
-        >
-          <h3
-            style={{
-              height: streamError ? 24 : 0,
-              lineHeight: '1.2',
-              marginBottom: 16,
-              textAlign: 'center',
-              color: '#ff6b6b',
-              opacity: streamError ? 1 : 0,
-              transition: 'all 250ms ease-in-out'
-            }}
-          >
-            {streamError ? streamError.name : ''}
-          </h3>
-          <video
-            ref={node => {
-              this.video = node
-            }}
-            style={{
-              width: '100%',
-              maxHeight: 'calc(50vh - 16px)',
-              background: '#212529',
-              cursor: 'pointer'
-            }}
-            src={
-              window.URL
-                ? window.URL.createObjectURL(this.props.stream)
-                : this.props.stream
-            }
-            autoplay
-            muted
-            onClick={this.handleClick}
-          />
-          <canvas
-            ref={node => {
-              this.canvas = node
-            }}
-            style={{ display: 'none' }}
-          />
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              marginTop: 16,
-              marginBottom: 16
-            }}
-          >
-            <button
-              style={{
-                paddingTop: 8,
-                paddingRight: 16,
-                paddingBottom: 8,
-                paddingLeft: 16,
-                margin: '0 auto',
-                fontSize: 20,
-                lineHeight: '1.6',
-                color: '#adb5bd',
-                background: '#343a40',
-                border: 'none',
-                outline: 'none',
-                boxShadow: 'none',
-                borderRadius: 5,
-                cursor: 'pointer',
-                opacity: streamError ? 0 : 1,
-                transition: 'all 250ms ease-in-out'
-              }}
-              disabled={streamError}
-              type={'button'}
-              onClick={this.handleClick}
-            >
-              Take Picture
-            </button>
-          </div>
-
-        </div>
-      )
-    }
-
-    handleClick = () => {
-      const canvas = this.canvas
-      const ctx = canvas.getContext('2d')
-      const width = this.video.videoWidth
-      const height = this.video.videoHeight
-      canvas.width = width
-      canvas.height = height
-      ctx.fillRect(0, 0, width, height)
-      ctx.drawImage(this.video, 0, 0, width, height)
-
-      this.props.actions.saveImage(canvas.toDataURL('image/webp'))
-    };
+// action type to update state on
+// key to pass as prop
+// tracker sets the value of the prop "stream" when the action type is emitted
+// shouldTrackerUpdateState: you can cancel the internal setState call by returning false
+// default: () => true
+@track(
+  store.actions.mediaStreamSuccess,
+  'stream',
+  (state, payload, props, type) => {
+    console.log('tracker called with: ', { state, payload, props, type })
+    return state.camera.stream
+  },
+  (state, payload, props, type) => {
+    return !!payload
   }
 )
+@track(
+  store.actions.mediaStreamError,
+  'streamError',
+  (state, payload) => payload
+)
+class Camera extends Component {
+  video = null;
+  canvas = null;
 
-const ImageList = connect(state => ({
-  images: state.camera.images,
-  selectedImageId: state.ui.selectedImageId
-}))(function ImageList ({ actions, images, selectedImageId }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexFlow: 'wrap',
-        // perspective: '1000px'
-      }}
-    >
-      {images.map((image, i) => {
-        return (
-          <Image
-            key={image.id}
-            image={image}
-            index={i}
-            selected={image.id === selectedImageId}
-            onClick={() => {
-              actions.selectImage(
-                image.id === selectedImageId ? null : image.id
-              )
+  componentDidMount () {
+    this.props.actions.startMediaStream({
+      audio: false,
+      video: true
+    })
+  }
+
+  render ({ streamError }) {
+    return (
+      <div
+        style={{
+          paddingTop: 16,
+          paddingRight: 16,
+          paddingBottom: 16,
+          paddingLeft: 16
+        }}
+      >
+        <h3
+          style={{
+            height: streamError ? 24 : 0,
+            lineHeight: '1.2',
+            marginBottom: 16,
+            textAlign: 'center',
+            color: '#ff6b6b',
+            opacity: streamError ? 1 : 0,
+            transition: 'all 250ms ease-in-out'
+          }}
+        >
+          {streamError ? streamError.name : ''}
+        </h3>
+        <video
+          ref={node => {
+            this.video = node
+          }}
+          style={{
+            width: '100%',
+            maxHeight: 'calc(50vh - 16px)',
+            background: '#212529',
+            cursor: 'pointer'
+          }}
+          src={
+            window.URL && this.props.stream
+              ? window.URL.createObjectURL(this.props.stream)
+              : this.props.stream
+          }
+          autoplay
+          muted
+          onClick={this.handleClick}
+        />
+        <canvas
+          ref={node => {
+            this.canvas = node
+          }}
+          style={{ display: 'none' }}
+        />
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: '100%',
+            marginTop: 16,
+            marginBottom: 16
+          }}
+        >
+          <button
+            style={{
+              paddingTop: 8,
+              paddingRight: 16,
+              paddingBottom: 8,
+              paddingLeft: 16,
+              margin: '0 auto',
+              fontSize: 20,
+              lineHeight: '1.6',
+              color: '#adb5bd',
+              background: '#343a40',
+              border: 'none',
+              outline: 'none',
+              boxShadow: 'none',
+              borderRadius: 5,
+              cursor: 'pointer',
+              opacity: streamError ? 0 : 1,
+              transition: 'all 250ms ease-in-out'
             }}
-          />
-        )
-      })}
-    </div>
-  )
-})
+            disabled={streamError}
+            type={'button'}
+            onClick={this.handleClick}
+          >
+            Take Picture
+          </button>
+        </div>
+
+      </div>
+    )
+  }
+
+  handleClick = () => {
+    const canvas = this.canvas
+    const ctx = canvas.getContext('2d')
+    const width = this.video.videoWidth
+    const height = this.video.videoHeight
+    canvas.width = width
+    canvas.height = height
+    ctx.fillRect(0, 0, width, height)
+    ctx.drawImage(this.video, 0, 0, width, height)
+
+    this.props.actions.saveImage(canvas.toDataURL('image/webp'))
+  };
+}
+
+@track(store.actions.addImages, 'images', state => state.camera.images)
+@track(
+  store.actions.setSelectedImageById,
+  'selectedImageId',
+  state => state.ui.selectedImageId
+)
+class ImageList extends Component {
+  render () {
+    const { actions, images = [], selectedImageId } = this.props
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexFlow: 'wrap'
+        }}
+      >
+        {images.map((image, i) => {
+          return (
+            <Image
+              key={image.id}
+              image={image}
+              index={i}
+              selected={image.id === selectedImageId}
+              onClick={() => {
+                actions.selectImage(
+                  image.id === selectedImageId ? null : image.id
+                )
+              }}
+            />
+          )
+        })}
+      </div>
+    )
+  }
+}
 
 function Image ({ image, index, onClick, selected }) {
   const wrapperStyles = selected

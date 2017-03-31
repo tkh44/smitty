@@ -1,36 +1,34 @@
 import { Component, h } from 'preact'
 import { createStore } from '../../src'
 
-function getId (a) {
-  return a
-    ? (a ^ Math.random() * 16 >> a / 4).toString(16)
-    : ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, getId)
-}
-
 const tree = createStore({
-  instances: []
+  connections: [],
+  trackers: []
 })
 
 tree.createActions({
-  register: 'tree/REGISTER',
-  unregister: 'tree/UNREGISTER',
-  setUserStore: 'tree/SET_USER_STORE',
-  userStoreChange: 'tree/USER_STORE_CHANGE'
+  register: 'preact-smitty/REGISTER',
+  unregister: 'preact-smitty/UNREGISTER',
+  setUserStore: 'preact-smitty/SET_USER_STORE',
+  userStoreChange: 'preact-smitty/USER_STORE_CHANGE',
+  trackAction: 'preact-smitty/TRACK_ACTION',
+  releaseAction: 'preact-smitty/RELEASE_ACTION'
 })
 
-let calculateNextState = (userStoreState) => ({ id, instance, mapStateToProps, getProps }) => {
-  if (typeof mapStateToProps !== 'function') {
-    return
-  }
+let calculateNextState = userStoreState =>
+  ({ id, instance, mapStateToProps, getProps }) => {
+    if (typeof mapStateToProps !== 'function') {
+      return
+    }
 
-  const nextState = mapStateToProps.length === 2
-    ? mapStateToProps(userStoreState, getProps())
-    : mapStateToProps(userStoreState)
+    const nextState = mapStateToProps.length === 2
+      ? mapStateToProps(userStoreState, getProps())
+      : mapStateToProps(userStoreState)
 
-  if (instance.state !== nextState) {
-    instance.setState(nextState)
+    if (instance.state !== nextState) {
+      instance.setState(nextState)
+    }
   }
-}
 
 tree.handleActions({
   [tree.actions.setUserStore]: (state, payload) => {
@@ -38,18 +36,55 @@ tree.handleActions({
   },
   [tree.actions.register]: (state, payload) => {
     payload.instance.store = state.userStore
-    state.instances = state.instances.concat(payload)
+    state.connections = state.connections.concat(payload)
     calculateNextState(state.userStore.state)(payload)
   },
   [tree.actions.unregister]: (state, payload) => {
-    const index = state.instances.findIndex(inst => {
-      inst.id === payload
+    const index = state.connections.findIndex(inst => {
+      inst === payload
     })
-    state.instances.splice(index, 1)
+    state.connections.splice(index, 1)
   },
   [tree.actions.userStoreChange]: (state, userStoreState) => {
     const updater = calculateNextState(userStoreState)
-    state.instances.forEach(updater)
+    state.connections.forEach(updater)
+  },
+  [tree.actions.trackAction]: (state, payload) => {
+    payload.instance.store = state.userStore
+    let cb = data => {
+      let props = payload.getProps()
+      if (
+        payload.shouldTrackerUpdateState(
+          state.userStore.state,
+          data,
+          props,
+          payload.type
+        )
+      ) {
+        payload.instance.setState({
+          [payload.key]: payload.tracker(
+            state.userStore.state,
+            data,
+            props,
+            payload.type
+          )
+        })
+      }
+    }
+    state.userStore.on(payload.type, cb)
+    state.trackers.push({
+      instance: payload.instance,
+      type: payload.type,
+      cb
+    })
+  },
+  [tree.actions.releaseAction]: (state, payload) => {
+    const index = state.connections.findIndex(inst => {
+      inst === payload
+    })
+    const tracker = state.connectsion[index]
+    state.userStore.off(tracker.type, tracker.cb)
+    state.connections.splice(index, 1)
   }
 })
 
@@ -70,9 +105,7 @@ export function connect (mapStateToProps) {
     return class Connect extends Component {
       constructor (props) {
         super(props)
-        this.id = getId()
         tree.actions.register({
-          id: this.id,
           instance: this,
           mapStateToProps,
           getProps: () => this.props
@@ -81,6 +114,44 @@ export function connect (mapStateToProps) {
 
       componentWillUnmount () {
         tree.actions.unregister(this.id)
+      }
+
+      render (props, state) {
+        return h(
+          WrappedComponent,
+          Object.assign({}, Object.assign({}, props), state, {
+            emit: this.store.emit,
+            actions: this.store.actions
+          })
+        )
+      }
+    }
+  }
+}
+
+export function track (
+  type,
+  statePropertyKey,
+  tracker,
+  shouldTrackerUpdateState = () => true
+) {
+  return function wrapComponent (WrappedComponent) {
+    return class Connect extends Component {
+      constructor (props) {
+        super(props)
+
+        tree.actions.trackAction({
+          instance: this,
+          type: type.toString(),
+          key: statePropertyKey,
+          tracker,
+          shouldTrackerUpdateState,
+          getProps: () => this.props
+        })
+      }
+
+      componentWillUnmount () {
+        tree.actions.releaseAction(this)
       }
 
       render (props, state) {
