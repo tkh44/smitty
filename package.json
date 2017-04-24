@@ -2,34 +2,47 @@
   "name": "smitty",
   "version": "2.0.1",
   "description": "Tiny flux implementation built on mitt",
-  "main": "lib/index.js",
-  "module": "es/index.js",
+  "jsnext:main": "dist/smitty.es.js",
+  "module": "dist/smitty.es.js",
+  "main": "dist/smitty.js",
+  "umd:main": "dist/smitty.umd.js",
   "files": [
-    "es",
-    "lib",
-    "umd"
+    "dist"
   ],
   "scripts": {
-    "build": "nwb build-react-component",
-    "clean": "nwb clean-module && npm clean-demo",
+    "build": "npm-run-all clean -p rollup -p minify:* -s  size",
+    "build:demo": "nwb build-react-component",
+    "clean": "rimraf dist && nwb clean-demo",
     "start": "nwb serve-react-demo",
     "test": "nwb test-react",
     "test:coverage": "nwb test-react --coverage",
     "test:watch": "nwb test-react --server",
-    "deploy": "npm run build && gh-pages -d demo/dist"
+    "deploy": "nwb build-demo && gh-pages -d demo/dist",
+    "rollup": "rollup -c",
+    "minify:cjs": "uglifyjs $npm_package_main -cm toplevel -o $npm_package_main -p relative --in-source-map ${npm_package_main}.map --source-map ${npm_package_main}.map",
+    "minify:umd": "uglifyjs $npm_package_umd_main -cm -o $npm_package_umd_main -p relative --in-source-map ${npm_package_umd_main}.map --source-map ${npm_package_umd_main}.map",
+    "size": "echo \"Gzipped Size: $(strip-json-comments --no-whitespace $npm_package_main | gzip-size)\""
   },
   "peerDependencies": {
-    "mitt": "^1.1.0"
+    "mitt": "^1.1.2"
   },
   "devDependencies": {
     "gh-pages": "^0.12.0",
     "localforage": "^1.5.0",
-    "mitt": "^1.1.0",
+    "mitt": "^1.1.2",
     "nwb": "0.15.x",
-    "preact": "^7.2.0",
+    "preact": "^8.1.0",
     "raw-loader": "^0.5.1",
     "react": "^16.0.0-alpha.5",
-    "react-dom": "^16.0.0-alpha.5"
+    "react-dom": "^16.0.0-alpha.5",
+    "npm-run-all": "^4.0.2",
+    "pretty-bytes-cli": "^2.0.0",
+    "rollup": "^0.41.6",
+    "rollup-plugin-buble": "^0.15.0",
+    "rimraf": "^2.6.1",
+    "gzip-size-cli": "^2.0.0",
+    "strip-json-comments-cli": "^1.0.1",
+    "uglify-js": "^2.8.22"
   },
   "author": "Kye Hohenberger",
   "homepage": "https://github.com/tkh44/smitty#readme",
@@ -46,6 +59,14 @@
     "tiny-flux",
     "smitty"
   ],
+  "eslintConfig": {
+    "extends": "standard"
+  },
+  "standard": {
+    "ignore": [
+      "/dist/"
+    ]
+  },
   "bugs": {
     "url": "https://github.com/tkh44/smitty/issues"
   }
