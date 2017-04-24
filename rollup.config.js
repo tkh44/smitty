@@ -5,6 +5,9 @@ const pkg = JSON.parse(fs.readFileSync('./package.json'))
 
 export default {
   entry: 'src/index.js',
+  external: ['mitt'],
+  exports: 'named',
+  globals: { mitt: 'mitt' },
   useStrict: false,
   sourceMap: true,
   plugins: [buble()],

@@ -3,7 +3,7 @@ import './style.css'
 import { render, h, Component } from 'preact'
 import localforage from 'localforage'
 import { createStore } from '../../src'
-import { Provider, connect, track } from './preact-smitty'
+import { Provider, connect, track } from './react-smitty'
 
 localforage.config({ name: 'smitty_photo_booth' })
 
@@ -90,30 +90,20 @@ window.onpopstate = function (event) {
   )
 }
 
-// action type to update state on
-// key to pass as prop
-// tracker sets the value of the prop "stream" when the action type is emitted
-// shouldTrackerUpdateState: you can cancel the internal setState call by returning false
-// default: () => true
+
 @track(
-  store.actions.mediaStreamSuccess,
+  // action type to update state on
+  'camera/STREAM_SUCCESS',
+  // key to pass as prop
   'stream',
-  (state, payload, props, type) => {
-    console.log('tracker called with: ', { state, payload, props, type })
-    return state.camera.stream
-  },
-  (state, payload, props, type) => {
-    return !!payload
-  }
-)
-@track(
-  store.actions.mediaStreamError,
-  'streamError',
-  (state, payload) => payload
+  // tracker sets the value of the prop "stream" when the action type is emitted
+  (state, payload, props, type) => state.camera.stream,
+  // shouldTrackerUpdateState: default: () => true
+  (state, payload, props, type) => !!payload
 )
 class Camera extends Component {
-  video = null;
-  canvas = null;
+  video = null
+  canvas = null
 
   componentDidMount () {
     this.props.actions.startMediaStream({
@@ -222,14 +212,24 @@ class Camera extends Component {
     ctx.drawImage(this.video, 0, 0, width, height)
 
     this.props.actions.saveImage(canvas.toDataURL('image/webp'))
-  };
+  }
 }
 
-@track(store.actions.addImages, 'images', state => state.camera.images)
+
+
+
 @track(
-  store.actions.setSelectedImageById,
+  // Event type to update on
+  'ui/SELECT_IMAGE',
+  // Name of prop to pass to component
   'selectedImageId',
+  // Select value from state
   state => state.ui.selectedImageId
+)
+@track(
+  store.actions.addImages, // Use action creator trick
+  'images',
+  state => state.camera.images
 )
 class ImageList extends Component {
   render () {
