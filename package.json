@@ -1,6 +1,6 @@
 {
   "name": "smitty",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Tiny flux implementation built on mitt",
   "jsnext:main": "dist/smitty.es.js",
   "module": "dist/smitty.es.js",
