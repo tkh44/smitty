@@ -15,8 +15,8 @@
 
 -   [Install](#install)
 -   [Basic Usage](#basic-usage)
--   [Demos](#demos)
--   [Usage with Preact and React](#add-ons)
+-   [Demos](#demos-v2)
+-   [Usage with Preact and React](#usage-with-preact-and-react)
 -   [API](#api)
 -   [Store](#store)
 -   [Action Creator Detailed Example](#action-creator-detailed-example)
